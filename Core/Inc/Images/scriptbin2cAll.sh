@@ -5,7 +5,7 @@ if [ ! -d "image_h" ]; then
 fi
 
 # Chemin vers le dossier avec les images .bmp
-bmp_folder="../images_bmp"
+bmp_folder="../images_bmp_color"
 
 for file in "$bmp_folder"/*.bmp; do
 	if [ -f "$file" ]; then
