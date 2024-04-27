@@ -105,6 +105,7 @@ enum TailPart {
 enum TailPart tailPart = TailTop;
 
 uint8_t snakeSize = 0;
+uint32_t appleEaten = 0;
 
 uint8_t snakeHeadPosition[2] = {7, 6};
 uint8_t snakeBodyPosition[15 * 8][2] = {};
@@ -271,7 +272,7 @@ void StartDisplayTask(void const * argument)
 
 
     // On affiche le corps du snake
-    for (int i = 1; i <= snakeSize; i++) {
+    for (int i = 0; i < snakeSize; i++) {
       switch (snakeBodyParts[i]) {
         case BottomLeft:
           BSP_LCD_DrawBitmap(snakeBodyPosition[i][0]*32, snakeBodyPosition[i][1]*32, (uint8_t*)images_bmp_color_bottom_left_81CD4B_bmp);
@@ -311,9 +312,10 @@ void StartDisplayTask(void const * argument)
     }
 
     // On efface l'ancienne queue avec un carré vert
-    BSP_LCD_SetTextColor((uint32_t)0xFF81CD4B);
-    BSP_LCD_FillRect(oldTailPosition[0]*32, oldTailPosition[1]*32, 32, 32);
-
+    if (!appleEaten && (snakeHeadPosition[0] != oldTailPosition[0] || snakeHeadPosition[1] != oldTailPosition[1])) {
+      BSP_LCD_SetTextColor((uint32_t)0xFFFF0000); // 0xFF81CD4B
+      BSP_LCD_FillRect(oldTailPosition[0]*32, oldTailPosition[1]*32, 32, 32);
+    }
     // On affiche la pomme
     BSP_LCD_DrawBitmap(applePosition[0]*32, applePosition[1]*32, (uint8_t*)images_bmp_color_apple_81CD4B_bmp);
 
@@ -348,13 +350,13 @@ void StartJoystickTask(void const * argument)
 
     // max range of joystick is 0 to 4095
 
-    if (joystick_v < 1000 && direction != Up) {
+    if (joystick_v < 1000 && headPart != HeadTop) {
       direction = Down;
-    } else if (joystick_v > 3000 && direction != Down) {
+    } else if (joystick_v > 3000 && headPart != HeadBottom) {
       direction = Up;
-    } else if (joystick_h < 1000 && direction != Left) {
+    } else if (joystick_h < 1000 && headPart != HeadLeft) {
       direction = Right;
-    } else if (joystick_h > 3000 && direction != Right) {
+    } else if (joystick_h > 3000 && headPart != HeadRight) {
       direction = Left;
     }
     osDelay(1);
@@ -409,17 +411,28 @@ void StartManageBodyParts(void const * argument)
     // on vérifie si on a mangé la pomme avant de bouger le corps et la queue
     if (snakeHeadPosition[0] == applePosition[0] && snakeHeadPosition[1] == applePosition[1]) {
       snakeSize++;
+      appleEaten = 1;
 
       // il ne faut pas que la pomme apparaisse sur le snake
       applePosition[0] = rand() % gridSizeX;
       applePosition[1] = rand() % gridSizeY;
 
       // on ajoute un bodyPart juste derrière la tête
-      snakeBodyParts[0] = BottomTop;
+      for (int i = snakeSize - 1; i > 0; i--) {
+        snakeBodyParts[i] = snakeBodyParts[i - 1];
+      }
+      snakeBodyParts[0] = BottomTop; // on doit choisir le bon bodyPart en fonction de la direction de la tête
       snakeBodyPosition[0][0] = oldHeadPosition[0];
       snakeBodyPosition[0][1] = oldHeadPosition[1];
     }
     else {
+      appleEaten = 0;
+
+      // on met a jour la position de la queue
+      if (snakeSize > 0) {
+        snakeTailPosition[0] = snakeBodyPosition[snakeSize - 1][0];
+        snakeTailPosition[1] = snakeBodyPosition[snakeSize - 1][1];
+      }
       // On avance le corps
       for (int i = snakeSize - 1; i > 0; i--) {
         snakeBodyParts[i] = snakeBodyParts[i - 1];
@@ -428,26 +441,118 @@ void StartManageBodyParts(void const * argument)
         snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
       }
 
-      // On avance la queue
       if (snakeSize > 0) {
+        // On met a jour le premier bodyPart
+        switch (headPart) { // Working
+          case HeadTop: // Working
+            // BottomTop ou LeftTop ou RightTop
+            if (snakeBodyPosition[0][0] == snakeHeadPosition[0]) {
+              snakeBodyParts[0] = BottomTop;
+            }
+            else if (snakeBodyPosition[0][0] < snakeHeadPosition[0]) {
+              snakeBodyParts[0] = LeftTop;
+            }
+            else {
+              snakeBodyParts[0] = RightTop;
+            }
+            break;
+          case HeadBottom: // Working
+            // BottomTop ou BottomLeft ou BottomRight
+            if (snakeBodyPosition[0][0] == snakeHeadPosition[0]) {
+              snakeBodyParts[0] = BottomTop;
+            }
+            else if (snakeBodyPosition[0][0] < snakeHeadPosition[0]) {
+              snakeBodyParts[0] = BottomLeft;
+            }
+            else {
+              snakeBodyParts[0] = BottomRight;
+            }
+            break;
+          case HeadLeft: // Working
+            // BottomLeft ou LeftRight ou LeftTop
+            if (snakeBodyPosition[0][1] == snakeHeadPosition[1]) {
+              snakeBodyParts[0] = LeftRight;
+            }
+            else if (snakeBodyPosition[0][1] < snakeHeadPosition[1]) {
+              snakeBodyParts[0] = LeftTop;
+            }
+            else {
+              snakeBodyParts[0] = BottomLeft;
+            }
+            break;
+          case HeadRight: // Working
+            // RightTop ou BottomRight ou RightTop
+            if (snakeBodyPosition[0][1] == snakeHeadPosition[1]) {
+              snakeBodyParts[0] = LeftRight;
+            }
+            else if (snakeBodyPosition[0][1] < snakeHeadPosition[1]) {
+              snakeBodyParts[0] = RightTop;
+            }
+            else {
+              snakeBodyParts[0] = BottomRight;
+            }
+            break;
+        }
+
+        snakeBodyPosition[0][0] = oldHeadPosition[0];
+        snakeBodyPosition[0][1] = oldHeadPosition[1];
+
+
+        // On met a jour la queue
         switch (snakeBodyParts[snakeSize - 1]) {
           case BottomLeft:
-            // TailBottom ou TailLeft
+            // TailTop ou TailRight
+            if (snakeBodyPosition[snakeSize - 1][0] == snakeTailPosition[0]) {
+              tailPart = TailTop;
+            }
+            else {
+              tailPart = TailRight;
+            }
             break;
           case BottomRight:
-            // TailBottom ou TailRight
+            // TailBottom ou TailLeft
+            if (snakeBodyPosition[snakeSize - 1][0] == snakeTailPosition[0]) {
+              tailPart = TailTop;
+            }
+            else {
+              tailPart = TailLeft;
+            }
             break;
           case BottomTop:
-            // TailBottom ou TailTop
+            // TailTop ou TailBottom
+            if (snakeBodyPosition[snakeSize - 1][1] < snakeTailPosition[1]) {
+              tailPart = TailTop;
+            }
+            else {
+              tailPart = TailBottom;
+            }
             break;
           case LeftRight:
-            // TailLeft ou TailRight
+            // TailRight ou TailLeft
+            if (snakeBodyPosition[snakeSize - 1][0] < snakeTailPosition[0]) {
+              tailPart = TailLeft;
+            }
+            else {
+              tailPart = TailRight;
+            }
             break;
           case LeftTop:
-            // TailLeft ou TailTop
+            // TailRight ou TailBottom
+            if (snakeBodyPosition[snakeSize - 1][1] == snakeTailPosition[1]) {
+              tailPart = TailRight;
+            }
+            else {
+              tailPart = TailBottom;
+            }
             break;
           case RightTop:
-            // TailRight ou TailTop
+            // TailLeft ou TailBottom
+            if (snakeBodyPosition[snakeSize - 1][1] == snakeTailPosition[1]) {
+              tailPart = TailLeft;
+            }
+            else {
+              tailPart = TailBottom;
+            }
             break;
         }
       }
@@ -471,8 +576,6 @@ void StartManageBodyParts(void const * argument)
         snakeTailPosition[1] = oldHeadPosition[1];
       }
     }
-
-
 
 
 

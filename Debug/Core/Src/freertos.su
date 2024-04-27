@@ -1,6 +1,6 @@
-../Core/Src/freertos.c:139:6:vApplicationGetIdleTaskMemory	24	static
-../Core/Src/freertos.c:153:6:MX_FREERTOS_Init	128	static
-../Core/Src/freertos.c:204:6:StartDefaultTask	16	static
-../Core/Src/freertos.c:222:6:StartDisplayTask	224	static
-../Core/Src/freertos.c:333:6:StartJoystickTask	16	static
-../Core/Src/freertos.c:372:6:StartManageBodyParts	24	static
+../Core/Src/freertos.c:140:6:vApplicationGetIdleTaskMemory	24	static
+../Core/Src/freertos.c:154:6:MX_FREERTOS_Init	128	static
+../Core/Src/freertos.c:205:6:StartDefaultTask	16	static
+../Core/Src/freertos.c:223:6:StartDisplayTask	224	static
+../Core/Src/freertos.c:335:6:StartJoystickTask	16	static
+../Core/Src/freertos.c:374:6:StartManageBodyParts	32	static
