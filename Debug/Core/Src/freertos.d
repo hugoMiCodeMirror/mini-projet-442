@@ -62,7 +62,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/stm32746g_discovery_lcd.h ../Core/Inc/rk043fn48h.h \
  ../Core/Inc/stm32746g_discovery_sdram.h \
  ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
- ../Core/Inc/adc.h ../Core/Inc/main.h \
+ ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
+ ../Core/Inc/ts.h ../Core/Inc/adc.h ../Core/Inc/main.h \
  ../Core/Inc/Images/images_h/apple_\#81CD4B.h \
  ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h \
  ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h \
@@ -144,6 +145,9 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/stm32746g_discovery_sdram.h:
 ../Core/Inc/stm32746g_discovery.h:
 ../Core/Inc/../../Fonts/fonts.h:
+../Core/Inc/stm32746g_discovery_ts.h:
+../Core/Inc/ft5336.h:
+../Core/Inc/ts.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
 ../Core/Inc/Images/images_h/apple_\#81CD4B.h:
