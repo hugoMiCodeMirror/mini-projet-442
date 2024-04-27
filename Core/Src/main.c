@@ -37,6 +37,20 @@
 #include "stm32746g_discovery_ts.h"
 #include "stdio.h"
 #include "Images/images_h/apple_#D2664F.h"
+#include "Images/images_h/bottom-left_#D2664F.h"
+#include "Images/images_h/bottom-right_#D2664F.h"
+#include "Images/images_h/bottom-top_#D2664F.h"
+#include "Images/images_h/head-bottom_#D2664F.h"
+#include "Images/images_h/head-top_#D2664F.h"
+#include "Images/images_h/head-left_#D2664F.h"
+#include "Images/images_h/head-right_#D2664F.h"
+#include "Images/images_h/left-right_#D2664F.h"
+#include "Images/images_h/left-top_#D2664F.h"
+#include "Images/images_h/right-top_#D2664F.h"
+#include "Images/images_h/tail-bottom_#D2664F.h"
+#include "Images/images_h/tail-top_#D2664F.h"
+#include "Images/images_h/tail-left_#D2664F.h"
+#include "Images/images_h/tail-right_#D2664F.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +70,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint32_t joystick_v;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,12 +92,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	char text[50]={};
-	static TS_StateTypeDef  TS_State;
-	uint32_t potl,potr,joystick_h;
-	ADC_ChannelConfTypeDef sConfig = {0};
-	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -130,7 +137,10 @@ int main(void)
   BSP_LCD_DisplayOn();
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear((uint32_t)0xFFD2664F);
-  BSP_LCD_DrawBitmap(100,100,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
+  BSP_LCD_DrawBitmap(0*64,0*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
+  BSP_LCD_DrawBitmap(1*64,1*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
+  BSP_LCD_DrawBitmap(2*64,2*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
+  BSP_LCD_DrawBitmap(3*64,3*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
   BSP_LCD_SelectLayer(1);
   BSP_LCD_Clear(00);
   BSP_LCD_SetFont(&Font12);
@@ -138,6 +148,7 @@ int main(void)
   BSP_LCD_SetBackColor(00);
 
   BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -152,41 +163,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  	HAL_GPIO_WritePin(LED13_GPIO_Port,LED13_Pin,HAL_GPIO_ReadPin(BP1_GPIO_Port,BP1_Pin));
-		HAL_GPIO_WritePin(LED14_GPIO_Port,LED14_Pin,HAL_GPIO_ReadPin(BP2_GPIO_Port,BP2_Pin));
-		sprintf(text,"BP1 : %d",HAL_GPIO_ReadPin(BP1_GPIO_Port,BP1_Pin));
-		BSP_LCD_DisplayStringAtLine(5,(uint8_t*) text);
-
-		sConfig.Channel = ADC_CHANNEL_6;
-		HAL_ADC_ConfigChannel(&hadc3, &sConfig);
-		HAL_ADC_Start(&hadc3);
-		while(HAL_ADC_PollForConversion(&hadc3, 100)!=HAL_OK);
-		potr = HAL_ADC_GetValue(&hadc3);
-
-		sConfig.Channel = ADC_CHANNEL_7;
-		HAL_ADC_ConfigChannel(&hadc3, &sConfig);
-		HAL_ADC_Start(&hadc3);
-		while(HAL_ADC_PollForConversion(&hadc3, 100)!=HAL_OK);
-		potl = HAL_ADC_GetValue(&hadc3);
-
-		sConfig.Channel = ADC_CHANNEL_8;
-		HAL_ADC_ConfigChannel(&hadc3, &sConfig);
-		HAL_ADC_Start(&hadc3);
-		while(HAL_ADC_PollForConversion(&hadc3, 100)!=HAL_OK);
-		joystick_v = HAL_ADC_GetValue(&hadc3);
-
-		HAL_ADC_Start(&hadc1);
-		while(HAL_ADC_PollForConversion(&hadc1, 100)!=HAL_OK);
-		joystick_h = HAL_ADC_GetValue(&hadc1);
-
-		sprintf(text,"POTL : %4u POTR : %4u joy_v : %4u joy_h : %4u",(uint16_t)potl,(uint16_t)potr,(uint16_t)joystick_v,(uint16_t)joystick_h);
-		BSP_LCD_DisplayStringAtLine(9,(uint8_t*) text);
-
-		BSP_TS_GetState(&TS_State);
-		if(TS_State.touchDetected){
-			//TODO : Il faudrait vérifier que le cercle reste entièrement sur l'écran...
-		  BSP_LCD_FillCircle(TS_State.touchX[0],TS_State.touchY[0],4);
-	  	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
