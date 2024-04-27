@@ -120,7 +120,8 @@ osThreadId manageBodyPartsHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_t backY, uint8_t missingX, uint8_t missingY);
+uint8_t isSnakePosition(uint8_t x, uint8_t y);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -313,7 +314,7 @@ void StartDisplayTask(void const * argument)
 
     // On efface l'ancienne queue avec un carré vert
     if (!appleEaten && (snakeHeadPosition[0] != oldTailPosition[0] || snakeHeadPosition[1] != oldTailPosition[1])) {
-      BSP_LCD_SetTextColor((uint32_t)0xFFFF0000); // 0xFF81CD4B
+      BSP_LCD_SetTextColor((uint32_t)0xFF81CD4B); // 0xFF81CD4B
       BSP_LCD_FillRect(oldTailPosition[0]*32, oldTailPosition[1]*32, 32, 32);
     }
     // On affiche la pomme
@@ -385,7 +386,9 @@ void StartManageBodyParts(void const * argument)
     oldTailPosition[0] = snakeTailPosition[0];
     oldTailPosition[1] = snakeTailPosition[1];
 
-    uint8_t oldHeadPosition[2] = {snakeHeadPosition[0], snakeHeadPosition[1]};
+    uint8_t oldHeadPosition[2];
+    oldHeadPosition[0] = snakeHeadPosition[0];
+    oldHeadPosition[1] = snakeHeadPosition[1];
 
 
     // la tête
@@ -407,21 +410,75 @@ void StartManageBodyParts(void const * argument)
         snakeHeadPosition[0]++;
         break;
     }
+
+    // on vérifie si on est mort
+    if (snakeHeadPosition[0] >= gridSizeX || snakeHeadPosition[1] >= gridSizeY || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0) {
+      snakeSize = 0;
+      snakeHeadPosition[0] = 7;
+      snakeHeadPosition[1] = 6;
+      snakeTailPosition[0] = 7;
+      snakeTailPosition[1] = 7;
+      direction = Up;
+      headPart = HeadTop;
+      tailPart = TailTop;
+      BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+    }
+    for (int i = 0; i < snakeSize; i++) {
+      if (snakeHeadPosition[0] == snakeBodyPosition[i][0] && snakeHeadPosition[1] == snakeBodyPosition[i][1]) {
+        snakeSize = 0;
+        snakeHeadPosition[0] = 7;
+        snakeHeadPosition[1] = 6;
+        snakeTailPosition[0] = 7;
+        snakeTailPosition[1] = 7;
+        direction = Up;
+        headPart = HeadTop;
+        tailPart = TailTop;
+        BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+      }
+    }
+    if (snakeHeadPosition[0] == snakeTailPosition[0] && snakeHeadPosition[1] == snakeTailPosition[1]) {
+      snakeSize = 0;
+      snakeHeadPosition[0] = 7;
+      snakeHeadPosition[1] = 6;
+      snakeTailPosition[0] = 7;
+      snakeTailPosition[1] = 7;
+      direction = Up;
+      headPart = HeadTop;
+      tailPart = TailTop;
+      BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+    }
+
     
     // on vérifie si on a mangé la pomme avant de bouger le corps et la queue
     if (snakeHeadPosition[0] == applePosition[0] && snakeHeadPosition[1] == applePosition[1]) {
       snakeSize++;
       appleEaten = 1;
 
-      // il ne faut pas que la pomme apparaisse sur le snake
-      applePosition[0] = rand() % gridSizeX;
-      applePosition[1] = rand() % gridSizeY;
+      // Generate a random apple position until it is not occupied by the snake
+      do {
+        applePosition[0] = rand() % gridSizeX;
+        applePosition[1] = rand() % gridSizeY;
+      } while (isSnakePosition(applePosition[0], applePosition[1]));
 
       // on ajoute un bodyPart juste derrière la tête
       for (int i = snakeSize - 1; i > 0; i--) {
         snakeBodyParts[i] = snakeBodyParts[i - 1];
+        snakeBodyPosition[i][0] = snakeBodyPosition[i - 1][0];
+        snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
       }
-      snakeBodyParts[0] = BottomTop; // on doit choisir le bon bodyPart en fonction de la direction de la tête
+      uint8_t backX;
+      uint8_t backY;
+
+      if (snakeSize > 1) {
+        backX = snakeBodyPosition[0][0];
+        backY = snakeBodyPosition[0][1];
+      }
+      else {
+        backX = snakeTailPosition[0];
+        backY = snakeTailPosition[1];
+      }
+
+      snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], backX, backY, oldHeadPosition[0], oldHeadPosition[1]);
       snakeBodyPosition[0][0] = oldHeadPosition[0];
       snakeBodyPosition[0][1] = oldHeadPosition[1];
     }
@@ -433,70 +490,26 @@ void StartManageBodyParts(void const * argument)
         snakeTailPosition[0] = snakeBodyPosition[snakeSize - 1][0];
         snakeTailPosition[1] = snakeBodyPosition[snakeSize - 1][1];
       }
+      else {
+        snakeTailPosition[0] = oldHeadPosition[0];
+        snakeTailPosition[1] = oldHeadPosition[1];
+      }
+
+
       // On avance le corps
       for (int i = snakeSize - 1; i > 0; i--) {
         snakeBodyParts[i] = snakeBodyParts[i - 1];
-        // on met a jour snakeBodyPosition
         snakeBodyPosition[i][0] = snakeBodyPosition[i - 1][0];
         snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
       }
 
+
+      // On met a jour le corps
       if (snakeSize > 0) {
         // On met a jour le premier bodyPart
-        switch (headPart) { // Working
-          case HeadTop: // Working
-            // BottomTop ou LeftTop ou RightTop
-            if (snakeBodyPosition[0][0] == snakeHeadPosition[0]) {
-              snakeBodyParts[0] = BottomTop;
-            }
-            else if (snakeBodyPosition[0][0] < snakeHeadPosition[0]) {
-              snakeBodyParts[0] = LeftTop;
-            }
-            else {
-              snakeBodyParts[0] = RightTop;
-            }
-            break;
-          case HeadBottom: // Working
-            // BottomTop ou BottomLeft ou BottomRight
-            if (snakeBodyPosition[0][0] == snakeHeadPosition[0]) {
-              snakeBodyParts[0] = BottomTop;
-            }
-            else if (snakeBodyPosition[0][0] < snakeHeadPosition[0]) {
-              snakeBodyParts[0] = BottomLeft;
-            }
-            else {
-              snakeBodyParts[0] = BottomRight;
-            }
-            break;
-          case HeadLeft: // Working
-            // BottomLeft ou LeftRight ou LeftTop
-            if (snakeBodyPosition[0][1] == snakeHeadPosition[1]) {
-              snakeBodyParts[0] = LeftRight;
-            }
-            else if (snakeBodyPosition[0][1] < snakeHeadPosition[1]) {
-              snakeBodyParts[0] = LeftTop;
-            }
-            else {
-              snakeBodyParts[0] = BottomLeft;
-            }
-            break;
-          case HeadRight: // Working
-            // RightTop ou BottomRight ou RightTop
-            if (snakeBodyPosition[0][1] == snakeHeadPosition[1]) {
-              snakeBodyParts[0] = LeftRight;
-            }
-            else if (snakeBodyPosition[0][1] < snakeHeadPosition[1]) {
-              snakeBodyParts[0] = RightTop;
-            }
-            else {
-              snakeBodyParts[0] = BottomRight;
-            }
-            break;
-        }
-
+        snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], snakeBodyPosition[0][0], snakeBodyPosition[0][1], oldHeadPosition[0], oldHeadPosition[1]);
         snakeBodyPosition[0][0] = oldHeadPosition[0];
         snakeBodyPosition[0][1] = oldHeadPosition[1];
-
 
         // On met a jour la queue
         switch (snakeBodyParts[snakeSize - 1]) {
@@ -571,21 +584,97 @@ void StartManageBodyParts(void const * argument)
             tailPart = TailRight;
             break;
         }
-      
-        snakeTailPosition[0] = oldHeadPosition[0];
-        snakeTailPosition[1] = oldHeadPosition[1];
       }
     }
 
 
 
-    osDelay(300);
+    osDelay(250);
   }
   /* USER CODE END StartManageBodyParts */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_t backY, uint8_t missingX, uint8_t missingY)
+{
+  /*
+    . F .
+    . X .
+    . B .
+  */
+  if (frontX == backX)
+    return BottomTop;
 
+  /*
+    . . .
+    F X B
+    . . .
+  */
+  if (frontY == backY)
+    return LeftRight;
+
+  /*
+    . B .       . . .
+    F X .       . X B
+    . . .       . F .
+  */
+  if (frontX < backX && frontY > backY)
+    if (missingX == frontX)
+      return BottomRight;
+    else
+      return LeftTop;
+
+  /*
+    . . .       . F .
+    F X .       . X B
+    . B .       . . .
+  */
+  if (frontX < backX && frontY < backY)
+    if (missingX == frontX)
+      return RightTop;
+    else
+      return BottomLeft;
+
+  /*
+    . . .       . F .
+    . X F       B X .
+    . B .       . . .
+  */
+  if (frontX > backX && frontY < backY)
+    if (missingX == frontX)
+      return LeftTop;
+    else
+      return BottomRight;
+
+  /*
+    . B .       . . .
+    . X F       B X .
+    . . .       . F .
+  */
+  if (frontX > backX && frontY > backY)
+    if (missingX == frontX)
+      return BottomLeft;
+    else
+      return RightTop;
+  
+}
+
+
+uint8_t isSnakePosition(uint8_t x, uint8_t y)
+{
+  if (x == snakeHeadPosition[0] && y == snakeHeadPosition[1])
+    return 1;
+
+  for (int i = 0; i < snakeSize; i++) {
+    if (x == snakeBodyPosition[i][0] && y == snakeBodyPosition[i][1])
+      return 1;
+  }
+
+  if (x == snakeTailPosition[0] && y == snakeTailPosition[1])
+    return 1;
+
+  return 0;
+}
 /* USER CODE END Application */
 
