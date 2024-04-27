@@ -36,7 +36,7 @@
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
 #include "stdio.h"
-#include "Images/image_h/apple.h"
+#include "Images/images_h/apple_#D2664F.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -129,8 +129,8 @@ int main(void)
   BSP_LCD_LayerDefaultInit(1, LCD_FB_START_ADDRESS+ BSP_LCD_GetXSize()*BSP_LCD_GetYSize()*4);
   BSP_LCD_DisplayOn();
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear(LCD_COLOR_RED);
-  BSP_LCD_DrawBitmap(100,100,(uint8_t*)apple_bmp);
+  BSP_LCD_Clear((uint32_t)0xFFD2664F);
+  BSP_LCD_DrawBitmap(100,100,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
   BSP_LCD_SelectLayer(1);
   BSP_LCD_Clear(00);
   BSP_LCD_SetFont(&Font12);

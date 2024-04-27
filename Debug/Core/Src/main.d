@@ -67,7 +67,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/stm32746g_discovery_sdram.h \
  ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
  ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
- ../Core/Inc/ts.h ../Core/Inc/Images/image_h/apple.h
+ ../Core/Inc/ts.h ../Core/Inc/Images/images_h/apple_\#D2664F.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 ../Core/Inc/stm32f7xx_hal_conf.h:
@@ -149,4 +149,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/stm32746g_discovery_ts.h:
 ../Core/Inc/ft5336.h:
 ../Core/Inc/ts.h:
-../Core/Inc/Images/image_h/apple.h:
+../Core/Inc/Images/images_h/apple_\#D2664F.h:
