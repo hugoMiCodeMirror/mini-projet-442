@@ -67,21 +67,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/stm32746g_discovery_sdram.h \
  ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
  ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
- ../Core/Inc/ts.h ../Core/Inc/Images/images_h/apple_\#D2664F.h \
- ../Core/Inc/Images/images_h/bottom-left_\#D2664F.h \
- ../Core/Inc/Images/images_h/bottom-right_\#D2664F.h \
- ../Core/Inc/Images/images_h/bottom-top_\#D2664F.h \
- ../Core/Inc/Images/images_h/head-bottom_\#D2664F.h \
- ../Core/Inc/Images/images_h/head-top_\#D2664F.h \
- ../Core/Inc/Images/images_h/head-left_\#D2664F.h \
- ../Core/Inc/Images/images_h/head-right_\#D2664F.h \
- ../Core/Inc/Images/images_h/left-right_\#D2664F.h \
- ../Core/Inc/Images/images_h/left-top_\#D2664F.h \
- ../Core/Inc/Images/images_h/right-top_\#D2664F.h \
- ../Core/Inc/Images/images_h/tail-bottom_\#D2664F.h \
- ../Core/Inc/Images/images_h/tail-top_\#D2664F.h \
- ../Core/Inc/Images/images_h/tail-left_\#D2664F.h \
- ../Core/Inc/Images/images_h/tail-right_\#D2664F.h
+ ../Core/Inc/ts.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 ../Core/Inc/stm32f7xx_hal_conf.h:
@@ -163,18 +149,3 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/stm32746g_discovery_ts.h:
 ../Core/Inc/ft5336.h:
 ../Core/Inc/ts.h:
-../Core/Inc/Images/images_h/apple_\#D2664F.h:
-../Core/Inc/Images/images_h/bottom-left_\#D2664F.h:
-../Core/Inc/Images/images_h/bottom-right_\#D2664F.h:
-../Core/Inc/Images/images_h/bottom-top_\#D2664F.h:
-../Core/Inc/Images/images_h/head-bottom_\#D2664F.h:
-../Core/Inc/Images/images_h/head-top_\#D2664F.h:
-../Core/Inc/Images/images_h/head-left_\#D2664F.h:
-../Core/Inc/Images/images_h/head-right_\#D2664F.h:
-../Core/Inc/Images/images_h/left-right_\#D2664F.h:
-../Core/Inc/Images/images_h/left-top_\#D2664F.h:
-../Core/Inc/Images/images_h/right-top_\#D2664F.h:
-../Core/Inc/Images/images_h/tail-bottom_\#D2664F.h:
-../Core/Inc/Images/images_h/tail-top_\#D2664F.h:
-../Core/Inc/Images/images_h/tail-left_\#D2664F.h:
-../Core/Inc/Images/images_h/tail-right_\#D2664F.h:

@@ -55,5 +55,28 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false
+  "C_Cpp_Runner.msvcSecureNoWarnings": false,
+  "files.associations": {
+    "apple_#d2664f.h": "c",
+    "bottom-left_#d2664f.h": "c",
+    "bottom-right_#d2664f.h": "c",
+    "bottom-left_#81cd4b.h": "c",
+    "bottom-top_#d2664f.h": "c",
+    "bottom-top_#81cd4b.h": "c",
+    "head-bottom_#d2664f.h": "c",
+    "head-top_#d2664f.h": "c",
+    "head-left_#d2664f.h": "c",
+    "head-left_#81cd4b.h": "c",
+    "head-right_#d2664f.h": "c",
+    "head-right_#81cd4b.h": "c",
+    "left-right_#d2664f.h": "c",
+    "left-top_#d2664f.h": "c",
+    "right-top_#d2664f.h": "c",
+    "tail-bottom_#d2664f.h": "c",
+    "tail-top_#d2664f.h": "c",
+    "tail-left_#d2664f.h": "c",
+    "tail-right_#d2664f.h": "c",
+    "tail-right_#81cd4b.h": "c",
+    "right-top_#81cd4b.h": "c"
+  }
 }

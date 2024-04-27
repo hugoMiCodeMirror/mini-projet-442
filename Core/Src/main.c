@@ -36,21 +36,6 @@
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
 #include "stdio.h"
-#include "Images/images_h/apple_#D2664F.h"
-#include "Images/images_h/bottom-left_#D2664F.h"
-#include "Images/images_h/bottom-right_#D2664F.h"
-#include "Images/images_h/bottom-top_#D2664F.h"
-#include "Images/images_h/head-bottom_#D2664F.h"
-#include "Images/images_h/head-top_#D2664F.h"
-#include "Images/images_h/head-left_#D2664F.h"
-#include "Images/images_h/head-right_#D2664F.h"
-#include "Images/images_h/left-right_#D2664F.h"
-#include "Images/images_h/left-top_#D2664F.h"
-#include "Images/images_h/right-top_#D2664F.h"
-#include "Images/images_h/tail-bottom_#D2664F.h"
-#include "Images/images_h/tail-top_#D2664F.h"
-#include "Images/images_h/tail-left_#D2664F.h"
-#include "Images/images_h/tail-right_#D2664F.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,6 +55,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+ADC_ChannelConfTypeDef sConfig = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,6 +78,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -136,15 +124,11 @@ int main(void)
   BSP_LCD_LayerDefaultInit(1, LCD_FB_START_ADDRESS+ BSP_LCD_GetXSize()*BSP_LCD_GetYSize()*4);
   BSP_LCD_DisplayOn();
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear((uint32_t)0xFFD2664F);
-  BSP_LCD_DrawBitmap(0*64,0*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
-  BSP_LCD_DrawBitmap(1*64,1*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
-  BSP_LCD_DrawBitmap(2*64,2*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
-  BSP_LCD_DrawBitmap(3*64,3*64,(uint8_t*)images_bmp_color_apple_D2664F_bmp);
+  BSP_LCD_Clear((uint32_t)0xFF81CD4B);
   BSP_LCD_SelectLayer(1);
   BSP_LCD_Clear(00);
-  BSP_LCD_SetFont(&Font12);
-  BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+  BSP_LCD_SetFont(&Font16);
+  BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
   BSP_LCD_SetBackColor(00);
 
   BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
