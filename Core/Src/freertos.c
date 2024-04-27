@@ -436,17 +436,18 @@ void StartManageBodyParts(void const * argument)
         BSP_LCD_Clear((uint32_t)0xFF81CD4B);
       }
     }
-    if (snakeHeadPosition[0] == snakeTailPosition[0] && snakeHeadPosition[1] == snakeTailPosition[1]) {
-      snakeSize = 0;
-      snakeHeadPosition[0] = 7;
-      snakeHeadPosition[1] = 6;
-      snakeTailPosition[0] = 7;
-      snakeTailPosition[1] = 7;
-      direction = Up;
-      headPart = HeadTop;
-      tailPart = TailTop;
-      BSP_LCD_Clear((uint32_t)0xFF81CD4B);
-    }
+    // on meurt quand on rattrape la queue par l'arrirere peut etre enlever cette condition
+    // if (snakeHeadPosition[0] == snakeTailPosition[0] && snakeHeadPosition[1] == snakeTailPosition[1]) {
+    //   snakeSize = 0;
+    //   snakeHeadPosition[0] = 7;
+    //   snakeHeadPosition[1] = 6;
+    //   snakeTailPosition[0] = 7;
+    //   snakeTailPosition[1] = 7;
+    //   direction = Up;
+    //   headPart = HeadTop;
+    //   tailPart = TailTop;
+    //   BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+    // }
 
     
     // on vérifie si on a mangé la pomme avant de bouger le corps et la queue
