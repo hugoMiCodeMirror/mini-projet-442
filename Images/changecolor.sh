@@ -28,7 +28,7 @@ for img in "$input_folder"/*.bmp; do
     filename_no_ext="${filename%.*}"
 
     # Appliquer la transformation avec ImageMagick
-    convert "$img" -fill "$background_color_rgb" -opaque white "$output_folder/$filename_no_ext"_modifie.bmp
+    convert "$img" -fill "$background_color_rgb" -opaque white "$output_folder/$filename_no_ext""_$background_color_hex.bmp"
 
     # Afficher le nom du fichier traité
     echo "Image traitée : $filename"
