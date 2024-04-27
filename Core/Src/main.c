@@ -36,7 +36,7 @@
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
 #include "stdio.h"
-#include "Images_snake/apple.h"
+#include "Images/image_h/apple.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

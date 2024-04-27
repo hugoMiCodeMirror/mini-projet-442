@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Toolchain: GNU Tools for STM32 (11.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -38,34 +38,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := miniProjet442
+BUILD_ARTIFACT_NAME := mini-projet-442
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-miniProjet442.elf \
+mini-projet-442.elf \
 
 MAP_FILES += \
-miniProjet442.map \
+mini-projet-442.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-miniProjet442.list \
+mini-projet-442.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: miniProjet442.elf secondary-outputs
+main-build: mini-projet-442.elf secondary-outputs
 
 # Tool invocations
-miniProjet442.elf miniProjet442.map: $(OBJS) $(USER_OBJS) /home/hugo/STM32CubeIDE/workspace_1.15.0/miniProjet442/STM32F746NGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "miniProjet442.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/hugo/STM32CubeIDE/workspace_1.15.0/miniProjet442/STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="miniProjet442.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+mini-projet-442.elf mini-projet-442.map: $(OBJS) $(USER_OBJS) C:\Users\Hugo\Repositories\ENS\442\mini-projet-442\STM32F746NGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "mini-projet-442.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Hugo\Repositories\ENS\442\mini-projet-442\STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="mini-projet-442.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -74,14 +74,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-miniProjet442.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "miniProjet442.list"
+mini-projet-442.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "mini-projet-442.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout miniProjet442.elf miniProjet442.list miniProjet442.map
+	-$(RM) default.size.stdout mini-projet-442.elf mini-projet-442.list mini-projet-442.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
