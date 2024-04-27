@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chemin vers le dossier contenant les images BMP avec fond blanc
-input_folder="images_bmp"
+input_folder="images_bmp_resized"
 
 # Chemin vers le dossier où seront placées les images modifiées
 output_folder="images_bmp_color"
@@ -28,7 +28,9 @@ for img in "$input_folder"/*.bmp; do
     filename_no_ext="${filename%.*}"
 
     # Appliquer la transformation avec ImageMagick
-    convert "$img" -fill "$background_color_rgb" -opaque white "$output_folder/$filename_no_ext""_$background_color_hex.bmp"
+    convert "$img" -fill "$background_color_rgb" -opaque white \
+		   -fuzz 30% -fill "$background_color_rgb" -opaque "#f0f0f0" \
+		   "$output_folder/$filename_no_ext""_$background_color_hex.bmp"
 
     # Afficher le nom du fichier traité
     echo "Image traitée : $filename"
