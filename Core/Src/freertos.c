@@ -71,7 +71,7 @@ uint32_t screenReleased = 0;
 
 const uint8_t gridSizeX = 15;
 const uint8_t gridSizeY = 8;
-const uint8_t NBApple = 4;
+const uint8_t NBApple = 40;
 uint8_t speed = 4; // Fréquence de rafraîchissement en Hz
 
 uint32_t joystick_v;
@@ -122,7 +122,7 @@ uint8_t snakeHeadPosition[2] = {7, 6};
 uint8_t snakeBodyPosition[15 * 8][2] = {};
 uint8_t snakeTailPosition[2] = {7, 7};
 uint8_t oldTailPosition[2];
-uint8_t applePosition[4][2];
+int8_t applePosition[40][2];
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId displayTaskHandle;
@@ -359,9 +359,9 @@ void StartDisplayTask(void const * argument)
       }
 
       // On affiche les pommes
-      for (int i = 0; i < NBApple; i++) {
-        BSP_LCD_DrawBitmap(applePosition[i][0]*32, applePosition[i][1]*32, (uint8_t*)images_bmp_color_apple_81CD4B_bmp);
-      }
+      for (int i = 0; i < NBApple; i++)
+        if (applePosition[i][0] != -1)
+          BSP_LCD_DrawBitmap(applePosition[i][0]*32, applePosition[i][1]*32, (uint8_t*)images_bmp_color_apple_81CD4B_bmp);
       xSemaphoreGive(displayMutexHandle);
     }
 
@@ -512,12 +512,20 @@ void StartManageBodyParts(void const * argument)
           snakeBodyPosition[0][0] = oldHeadPosition[0];
           snakeBodyPosition[0][1] = oldHeadPosition[1];
 
-          // On génère une nouvelle pomme à une position aléatoire qui n'est pas sur le snake ou une autre pomme
-          // TODO: Si on arrive a la fin du jeu, on ne peut plus générer de pomme car toutes les cases sont prises
-          do {
-            applePosition[i][0] = rand() % gridSizeX;
-            applePosition[i][1] = rand() % gridSizeY;
-          } while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
+          // Si on a de la place pour une nouvelle pomme
+          uint8_t NBFreeCells = gridSizeX * gridSizeY - snakeSize - 1;
+          if (NBFreeCells > NBApple) {
+            // On génère une nouvelle pomme à une position aléatoire qui n'est pas sur le snake ou une autre pomme
+            do {
+              applePosition[i][0] = rand() % gridSizeX;
+              applePosition[i][1] = rand() % gridSizeY;
+            } while (isSnakePosition(applePosition[i][0], applePosition[i][1]) 
+                  || isApplePosition(applePosition[i][0], applePosition[i][1], i));
+          }
+          else {
+            applePosition[i][0] = -1;
+            applePosition[i][1] = -1;
+          }
         }
       }
 

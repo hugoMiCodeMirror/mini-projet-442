@@ -3,10 +3,10 @@
 ../Core/Src/freertos.c:231:6:StartDefaultTask	16	static
 ../Core/Src/freertos.c:249:6:StartDisplayTask	328	static
 ../Core/Src/freertos.c:380:6:StartJoystickTask	16	static
-../Core/Src/freertos.c:419:6:StartManageBodyParts	64	static
-../Core/Src/freertos.c:642:6:StartTsHandlerTask	16	static
-../Core/Src/freertos.c:690:15:whatBodyPart	16	static
-../Core/Src/freertos.c:760:9:isSnakePosition	24	static
-../Core/Src/freertos.c:776:9:isApplePosition	24	static
-../Core/Src/freertos.c:789:6:restartGame	16	static
-../Core/Src/freertos.c:810:6:displayGameStatus	8	static
+../Core/Src/freertos.c:419:6:StartManageBodyParts	72	static
+../Core/Src/freertos.c:650:6:StartTsHandlerTask	16	static
+../Core/Src/freertos.c:698:15:whatBodyPart	16	static
+../Core/Src/freertos.c:768:9:isSnakePosition	24	static
+../Core/Src/freertos.c:784:9:isApplePosition	24	static
+../Core/Src/freertos.c:797:6:restartGame	16	static
+../Core/Src/freertos.c:818:6:displayGameStatus	8	static
