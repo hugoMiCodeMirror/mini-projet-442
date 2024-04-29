@@ -72,7 +72,7 @@ uint32_t screenReleased = 0;
 const uint8_t gridSizeX = 15;
 const uint8_t gridSizeY = 8;
 const uint8_t NBApple = 4;
-const uint8_t speed = 250; // période de rafraîchissement en ms
+uint8_t speed = 4; // Fréquence de rafraîchissement en Hz
 
 uint32_t joystick_v;
 uint32_t joystick_h;
@@ -278,14 +278,19 @@ void StartDisplayTask(void const * argument)
       char scoreText[100];
       sprintf(scoreText, (char *)"Score: %d", snakeSize);
 
+      // On convertit la vitesse en texte
+      char speedText[100];
+      sprintf(speedText, (char *)"Speed: %d Hz", speed);
+
       xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
       BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
       BSP_LCD_DrawHLine(0, 8*32, BSP_LCD_GetXSize());
       BSP_LCD_DrawHLine(0, 8*32 + 1, BSP_LCD_GetXSize());
 
-      // On affiche la direction et le score
+      // On affiche la direction, le score et la vitesse
       BSP_LCD_DisplayStringAt(0, 8*32 + 2, (uint8_t *)directionText, LEFT_MODE);
       BSP_LCD_DisplayStringAt(200, 8*32 + 2, (uint8_t *)scoreText, LEFT_MODE);
+      BSP_LCD_DisplayStringAt(350, 8*32 + 2, (uint8_t *)speedText, LEFT_MODE);
 
       // On affiche la tête du snake
       switch (headPart) {
@@ -415,7 +420,7 @@ void StartManageBodyParts(void const * argument)
 {
   /* USER CODE BEGIN StartManageBodyParts */
   TickType_t xLastWakeTime = xTaskGetTickCount();
-  const TickType_t delay = pdMS_TO_TICKS(speed);
+  const TickType_t delay = pdMS_TO_TICKS(1000. / speed);
 
   /* Infinite loop */
   for(;;)
