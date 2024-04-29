@@ -29,6 +29,7 @@
 #include "stm32746g_discovery_ts.h"
 #include "adc.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "Images/images_h/apple_#81CD4B.h"
 #include "Images/images_h/bottom-left_#81CD4B.h"
@@ -71,6 +72,7 @@ uint32_t screenReleased = 0;
 const uint8_t gridSizeX = 15;
 const uint8_t gridSizeY = 8;
 const uint8_t NBApple = 4;
+const uint8_t speed = 250; // période de rafraîchissement en ms
 
 uint32_t joystick_v;
 uint32_t joystick_h;
@@ -251,15 +253,13 @@ void StartDisplayTask(void const * argument)
   for(;;)
   {
     if (gameOver || gamePaused || !gameStarted) {
+      xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
       displayGameStatus();
+      xSemaphoreGive(displayMutexHandle);
     }
     else {
-      BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
-      BSP_LCD_DrawHLine(0, 8*32, BSP_LCD_GetXSize());
-      BSP_LCD_DrawHLine(0, 8*32 + 1, BSP_LCD_GetXSize());
-
+      // On convertit la direction en texte
       char directionText[100];
-      // on affiche la direction
       switch (direction) {
         case Up:
           sprintf(directionText, (char *)"Direction: Up   ");
@@ -274,13 +274,18 @@ void StartDisplayTask(void const * argument)
           sprintf(directionText, (char *)"Direction: Right");
           break;
       }
-      BSP_LCD_DisplayStringAt(0, 8*32 + 2, (uint8_t *)directionText, LEFT_MODE);
-
-      // On affiche le score a la suite de la direction
+      // On convertit le score en texte
       char scoreText[100];
       sprintf(scoreText, (char *)"Score: %d", snakeSize);
-      BSP_LCD_DisplayStringAt(200, 8*32 + 2, (uint8_t *)scoreText, LEFT_MODE);
 
+      xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
+      BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+      BSP_LCD_DrawHLine(0, 8*32, BSP_LCD_GetXSize());
+      BSP_LCD_DrawHLine(0, 8*32 + 1, BSP_LCD_GetXSize());
+
+      // On affiche la direction et le score
+      BSP_LCD_DisplayStringAt(0, 8*32 + 2, (uint8_t *)directionText, LEFT_MODE);
+      BSP_LCD_DisplayStringAt(200, 8*32 + 2, (uint8_t *)scoreText, LEFT_MODE);
 
       // On affiche la tête du snake
       switch (headPart) {
@@ -297,7 +302,6 @@ void StartDisplayTask(void const * argument)
           BSP_LCD_DrawBitmap(snakeHeadPosition[0]*32, snakeHeadPosition[1]*32, (uint8_t*)images_bmp_color_head_right_81CD4B_bmp);
           break;
       }
-
 
       // On affiche le corps du snake
       for (int i = 0; i < snakeSize; i++) {
@@ -341,13 +345,19 @@ void StartDisplayTask(void const * argument)
 
       // On efface l'ancienne queue avec un carré vert
       if (!appleEaten && (snakeHeadPosition[0] != oldTailPosition[0] || snakeHeadPosition[1] != oldTailPosition[1])) {
+        // On efface l'ancienne queue si:
+        //    - le snake a avancé (la queue n'est pas restée à la même position)
+        // ou
+        //    - la tête n'est pas à la position de l'ancienne queue (le snake suit sa queue)
         BSP_LCD_SetTextColor((uint32_t)0xFF81CD4B); // 0xFF81CD4B
         BSP_LCD_FillRect(oldTailPosition[0]*32, oldTailPosition[1]*32, 32, 32);
       }
-      // On affiche la pomme
+
+      // On affiche les pommes
       for (int i = 0; i < NBApple; i++) {
         BSP_LCD_DrawBitmap(applePosition[i][0]*32, applePosition[i][1]*32, (uint8_t*)images_bmp_color_apple_81CD4B_bmp);
       }
+      xSemaphoreGive(displayMutexHandle);
     }
 
     osDelay(100);
@@ -389,7 +399,7 @@ void StartJoystickTask(void const * argument)
     } else if (joystick_h > 3000 && headPart != HeadRight) {
       direction = Left;
     }
-    osDelay(1);
+    osDelay(10);
   }
   /* USER CODE END StartJoystickTask */
 }
@@ -404,10 +414,16 @@ void StartJoystickTask(void const * argument)
 void StartManageBodyParts(void const * argument)
 {
   /* USER CODE BEGIN StartManageBodyParts */
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+  const TickType_t delay = pdMS_TO_TICKS(speed);
+
   /* Infinite loop */
   for(;;)
   {
     if (!gameOver && !gamePaused && gameStarted) {
+      // Le jeu est en cours
+
+      // On sauvegarde la position de la queue et de la tête
       oldTailPosition[0] = snakeTailPosition[0];
       oldTailPosition[1] = snakeTailPosition[1];
 
@@ -416,7 +432,7 @@ void StartManageBodyParts(void const * argument)
       oldHeadPosition[1] = snakeHeadPosition[1];
 
 
-      // la tête
+      // On met a jour la position de la tête en fonction de la direction
       switch (direction) {
         case Up:
           headPart = HeadTop;
@@ -438,39 +454,42 @@ void StartManageBodyParts(void const * argument)
 
       // on vérifie si on est mort
       if (snakeHeadPosition[0] >= gridSizeX || snakeHeadPosition[1] >= gridSizeY || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0) {
+        // On a touché un mur
         gameOver = 1;
 
-        displayGameStatus();
+        // displayGameStatus();
       }
-      for (int i = 0; i < snakeSize; i++) {
-        if (snakeHeadPosition[0] == snakeBodyPosition[i][0] && snakeHeadPosition[1] == snakeBodyPosition[i][1]) {
-          gameOver = 1;
+      else  {
+        for (int i = 0; i < snakeSize; i++) {
+          if (snakeHeadPosition[0] == snakeBodyPosition[i][0] && snakeHeadPosition[1] == snakeBodyPosition[i][1]) {
+            // On a touché notre corps
+            gameOver = 1;
 
-          displayGameStatus();
+            // displayGameStatus();
+          }
         }
       }
+      /*
+        Note: Inutile de vérifier si on a touché la queue. Celle ci n'a pas encore avancé.
+      */
 
 
       
-      // on vérifie si on a mangé la pomme avant de bouger le corps et la queue
+      // On vérifie si on a mangé la pomme avant de bouger le corps et la queue
       appleEaten = 0;
       for (int i = 0; i < NBApple; i++) {
         if (snakeHeadPosition[0] == applePosition[i][0] && snakeHeadPosition[1] == applePosition[i][1]) {
           snakeSize++;
           appleEaten = 1;
 
-          // Generate a random apple position until it is not occupied by the snake
-          do {
-            applePosition[i][0] = rand() % gridSizeX;
-            applePosition[i][1] = rand() % gridSizeY;
-          } while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
-
-          // on ajoute un bodyPart juste derrière la tête
+          // On ajoute un bodyPart à la queue
           for (int i = snakeSize - 1; i > 0; i--) {
             snakeBodyParts[i] = snakeBodyParts[i - 1];
             snakeBodyPosition[i][0] = snakeBodyPosition[i - 1][0];
             snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
           }
+
+          // On met a jour le premier bodyPart
           uint8_t backX;
           uint8_t backY;
 
@@ -483,13 +502,22 @@ void StartManageBodyParts(void const * argument)
             backY = snakeTailPosition[1];
           }
 
+          // Trouve le type de bodyPart à mettre
           snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], backX, backY, oldHeadPosition[0], oldHeadPosition[1]);
           snakeBodyPosition[0][0] = oldHeadPosition[0];
           snakeBodyPosition[0][1] = oldHeadPosition[1];
+
+          // On génère une nouvelle pomme à une position aléatoire qui n'est pas sur le snake ou une autre pomme
+          // TODO: Si on arrive a la fin du jeu, on ne peut plus générer de pomme car toutes les cases sont prises
+          do {
+            applePosition[i][0] = rand() % gridSizeX;
+            applePosition[i][1] = rand() % gridSizeY;
+          } while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
         }
       }
 
 
+      // On n'a pas mangé de pomme on avance le corps et la queue sans ajouter de bodyPart
       if (!appleEaten) {
         // on met a jour la position de la queue
         if (snakeSize > 0) {
@@ -512,12 +540,12 @@ void StartManageBodyParts(void const * argument)
 
         // On met a jour le corps
         if (snakeSize > 0) {
-          // On met a jour le premier bodyPart
+          // On trouve le type de bodyPart à mettre juste derrière la tête
           snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], snakeBodyPosition[0][0], snakeBodyPosition[0][1], oldHeadPosition[0], oldHeadPosition[1]);
           snakeBodyPosition[0][0] = oldHeadPosition[0];
           snakeBodyPosition[0][1] = oldHeadPosition[1];
 
-          // On met a jour la queue
+          // On met a jour le l'orientation de la queue
           switch (snakeBodyParts[snakeSize - 1]) {
             case BottomLeft:
               // TailTop ou TailRight
@@ -594,7 +622,7 @@ void StartManageBodyParts(void const * argument)
       }
     }
 
-    osDelay(250);
+    vTaskDelayUntil(&xLastWakeTime, delay);
   }
   /* USER CODE END StartManageBodyParts */
 }
@@ -625,7 +653,9 @@ void StartTsHandlerTask(void const * argument)
         restartGame();
       }
       else if (gamePaused) {
+        xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
         BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+        xSemaphoreGive(displayMutexHandle);
         gamePaused = 0;
       }
       else if (!gameStarted) {
@@ -675,45 +705,50 @@ enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_
     F X .       . X B
     . . .       . F .
   */
-  if (frontX < backX && frontY > backY)
+  if (frontX < backX && frontY > backY) {
     if (missingX == frontX)
       return BottomRight;
     else
       return LeftTop;
+  }
 
   /*
     . . .       . F .
     F X .       . X B
     . B .       . . .
   */
-  if (frontX < backX && frontY < backY)
+  if (frontX < backX && frontY < backY) {
     if (missingX == frontX)
       return RightTop;
     else
       return BottomLeft;
+  }
 
   /*
     . . .       . F .
     . X F       B X .
     . B .       . . .
   */
-  if (frontX > backX && frontY < backY)
+  if (frontX > backX && frontY < backY) {
     if (missingX == frontX)
       return LeftTop;
     else
       return BottomRight;
+  }
 
   /*
     . B .       . . .
     . X F       B X .
     . . .       . F .
   */
-  if (frontX > backX && frontY > backY)
+  if (frontX > backX && frontY > backY) {
     if (missingX == frontX)
       return BottomLeft;
     else
       return RightTop;
-  
+  }
+
+  return BottomTop; // should never happen
 }
 
 
