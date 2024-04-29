@@ -71,7 +71,7 @@ uint32_t screenReleased = 0;
 
 const uint8_t gridSizeX = 15;
 const uint8_t gridSizeY = 8;
-const uint8_t NBApple = 40;
+const uint8_t NBApple = 4;
 uint8_t speed = 4; // Fréquence de rafraîchissement en Hz
 
 uint32_t joystick_v;
@@ -123,7 +123,7 @@ uint8_t snakeHeadPosition[2] = {7, 6};
 uint8_t snakeBodyPosition[15 * 8][2] = {};
 uint8_t snakeTailPosition[2] = {7, 7};
 uint8_t oldTailPosition[2];
-int8_t applePosition[40][2];
+int8_t applePosition[4][2];
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId displayTaskHandle;
