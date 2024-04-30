@@ -72,7 +72,11 @@ uint32_t screenReleased = 0;
 const uint8_t gridSizeX = 15;
 const uint8_t gridSizeY = 8;
 const uint8_t NBApple = 4;
-uint8_t speed = 4; // Fréquence de rafraîchissement en Hz
+const uint8_t initSpeed = 3; // Fréquence de rafraîchissement en Hz
+const uint8_t palierIncreaseSpeed[5] = {4, 12, 22, 50, 75};
+
+uint8_t speed = initSpeed;
+
 
 uint32_t joystick_v;
 uint32_t joystick_h;
@@ -117,7 +121,7 @@ uint32_t appleEaten = 0;
 uint32_t gameStarted = 0;
 uint32_t gamePaused = 0;
 uint32_t gameOver = 0;
-uint32_t lastMove = 0; // dernier déplacement du snake avant la mort 
+uint32_t lastMove = 1; // dernier déplacement du snake avant la mort
 
 uint8_t snakeHeadPosition[2] = {7, 6};
 uint8_t snakeBodyPosition[15 * 8][2] = {};
@@ -253,7 +257,7 @@ void StartDisplayTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    if ((gameOver || gamePaused || !gameStarted) && !lastMove) {
+    if ((gameOver && !lastMove) || gamePaused || !gameStarted) { // revoir la condition
       xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
       displayGameStatus();
       xSemaphoreGive(displayMutexHandle);
@@ -294,7 +298,7 @@ void StartDisplayTask(void const * argument)
       BSP_LCD_DisplayStringAt(350, 8*32 + 2, (uint8_t *)speedText, LEFT_MODE);
 
       // On affiche la tête du snake
-      if (!lastMove)
+      if (!gameOver)
         switch (headPart) {
           case HeadBottom:
             BSP_LCD_DrawBitmap(snakeHeadPosition[0]*32, snakeHeadPosition[1]*32, (uint8_t*)images_bmp_color_head_bottom_81CD4B_bmp);
@@ -366,11 +370,11 @@ void StartDisplayTask(void const * argument)
           BSP_LCD_DrawBitmap(applePosition[i][0]*32, applePosition[i][1]*32, (uint8_t*)images_bmp_color_apple_81CD4B_bmp);
       xSemaphoreGive(displayMutexHandle);
 
-      if (lastMove)
+      if (gameOver)
         lastMove = 0;
     }
 
-    osDelay(100);
+    osDelay(90);
   }
   /* USER CODE END StartDisplayTask */
 }
@@ -425,11 +429,13 @@ void StartManageBodyParts(void const * argument)
 {
   /* USER CODE BEGIN StartManageBodyParts */
   TickType_t xLastWakeTime = xTaskGetTickCount();
-  const TickType_t delay = pdMS_TO_TICKS(1000. / speed);
+  TickType_t delay = pdMS_TO_TICKS(1000. / initSpeed);
 
   /* Infinite loop */
   for(;;)
   {
+    delay = pdMS_TO_TICKS(1000. / speed);
+
     if (!gameOver && !gamePaused && gameStarted) {
       // Le jeu est en cours
 
@@ -466,14 +472,12 @@ void StartManageBodyParts(void const * argument)
       if (snakeHeadPosition[0] >= gridSizeX || snakeHeadPosition[1] >= gridSizeY || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0) {
         // On a touché un mur
         gameOver = 1;
-        lastMove = 1;
       }
       else  {
         for (int i = 0; i < snakeSize; i++) {
           if (snakeHeadPosition[0] == snakeBodyPosition[i][0] && snakeHeadPosition[1] == snakeBodyPosition[i][1]) {
             // On a touché notre corps
             gameOver = 1;
-            lastMove = 1;
           }
         }
       }
@@ -486,6 +490,15 @@ void StartManageBodyParts(void const * argument)
         if (snakeHeadPosition[0] == applePosition[i][0] && snakeHeadPosition[1] == applePosition[i][1]) {
           snakeSize++;
           appleEaten = 1;
+
+          // On augmente la vitesse de 1Hz a chaque palier
+          for (int i = 0; i < 5; i++) {
+            if (snakeSize == palierIncreaseSpeed[i]) {
+              speed++;
+              break;
+            }
+          }
+
 
           // On ajoute un bodyPart à la queue
           for (int i = snakeSize - 1; i > 0; i--) {
@@ -796,8 +809,9 @@ uint8_t isApplePosition(uint8_t x, uint8_t y, uint8_t appleIndex)
 void restartGame()
 {
   gameOver = 0;
-  lastMove = 0;
+  lastMove = 1;
   snakeSize = 0;
+  speed = initSpeed;
   snakeHeadPosition[0] = 7;
   snakeHeadPosition[1] = 6;
   snakeTailPosition[0] = 7;
