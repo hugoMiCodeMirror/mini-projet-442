@@ -265,7 +265,31 @@ void initAudio(uint32_t freq)
 
 void readHeader()
 {
+	uint32_t data=0;
+	uint32_t nb_bl;
+	uint32_t bytesread;
+	uint32_t taille_octet;
 
+
+	//Lecture du nombre d'octets
+	f_lseek(&SDFile,04);
+	f_read(&SDFile, &data, 4, (void*) &bytesread);
+//	taille_fichier=((data|MASK_32_TO_8_0)<<24)|((data|MASK_32_TO_8_1)<<8)|((data|MASK_32_TO_8_2)>>8)|((data|MASK_32_TO_8_3)>>24);
+	taille_octet=data;
+	nb_bl=data/512;
+	NB_Bloc=(uint32_t)nb_bl;
+	data=0;
+
+	//Lecture de la fréquence d'échantillonnage
+	f_lseek(&SDFile,24);
+	f_read(&SDFile, &data, 4 , (void*) &bytesread);
+//	freq=((data2|MASK_32_TO_8_0)<<24)|((data2|MASK_32_TO_8_1)<<8)|((data2|MASK_32_TO_8_2)>>8)|((data2|MASK_32_TO_8_3)>>24);
+	freq_audio=data;
+
+	//Nombre d'octets par secondes
+	f_lseek(&SDFile,28);
+	f_read(&SDFile, (uint8_t*)&data, 4, (void*) &bytesread);
+	Nb_octets_seconde=data;
 }
 /* USER CODE END 4 */
 
