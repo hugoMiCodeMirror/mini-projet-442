@@ -56,6 +56,7 @@
 
 /* USER CODE BEGIN PV */
 ADC_ChannelConfTypeDef sConfig = {0};
+uint32_t freqAudio;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,7 +120,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   initDisplay();
   initSD();
-  initAudio();
+  // initAudio(freqAudio);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -257,7 +258,7 @@ void initAudio(uint32_t freq)
 {
 	static int init = 0;
 
-	BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, Audio_bit_res, Audio_chan);
+	BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2);
 }
 /* USER CODE END 4 */
 
