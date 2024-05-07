@@ -45,6 +45,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define ARBG8888_BYTE_PER_PIXEL 4
 #define SDRAM_WRITE_READ_ADDR        ((uint32_t)(LCD_FB_START_ADDRESS + (RK043FN48H_WIDTH * RK043FN48H_HEIGHT * ARBG8888_BYTE_PER_PIXEL)))
 
 #define SDRAM_WRITE_READ_ADDR_OFFSET ((uint32_t)0x0800)
@@ -145,7 +146,7 @@ int main(void)
   initDisplay();
   initSD();
   readHeader();
-  // initAudio(freqAudio);
+  initAudio(freqAudio);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -288,6 +289,13 @@ void initAudio(uint32_t freq)
 	}
 
 	memset((uint16_t*) AUDIO_BUFFER_OUT, 0, AUDIO_BLOCK_SIZE*2);
+
+	BSP_AUDIO_OUT_SetVolume(60);
+	BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
+	if (BSP_AUDIO_OUT_Play((uint16_t*) AUDIO_BUFFER_OUT, AUDIO_BLOCK_SIZE*2) == AUDIO_OK) {
+		if (!init)
+			init = 1;
+	}
 }
 
 void readHeader()
