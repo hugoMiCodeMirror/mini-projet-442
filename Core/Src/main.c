@@ -45,7 +45,24 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define AUDIO_BLOCK_SIZE ((uint32_t)512)
+#define SDRAM_WRITE_READ_ADDR        ((uint32_t)(LCD_FB_START_ADDRESS + (RK043FN48H_WIDTH * RK043FN48H_HEIGHT * ARBG8888_BYTE_PER_PIXEL)))
+
+#define SDRAM_WRITE_READ_ADDR_OFFSET ((uint32_t)0x0800)
+#define SRAM_WRITE_READ_ADDR_OFFSET  SDRAM_WRITE_READ_ADDR_OFFSET
+
+#define AUDIO_REC_START_ADDR         SDRAM_WRITE_READ_ADDR
+
+#define AUDIO_BLOCK_SIZE   	((uint32_t)512)
+#define AUDIO_BUFFER_IN    	AUDIO_REC_START_ADDR     /* In SDRAM */
+#define AUDIO_BUFFER_OUT   	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*2)) /* In SDRAM */
+#define AUDIO_BUFFER_READ  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*4))
+#define AUDIO_BUFFER_POST  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*6))
+
+#define Audio_freq 			48000
+#define Audio_bit_res 		DEFAULT_AUDIO_IN_BIT_RESOLUTION	//16
+#define Audio_chan 			DEFAULT_AUDIO_IN_CHANNEL_NBR	//2
+#define BytePerBloc			((uint16_t)Audio_bit_res*Audio_chan/8)
+#define BytePerSec			((uint32_t)BytePerBloc*Audio_freq)
 
 /* USER CODE END PD */
 
