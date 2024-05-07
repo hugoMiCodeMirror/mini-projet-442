@@ -63,7 +63,7 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+void initDisplay();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -116,20 +116,7 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-  BSP_LCD_Init();
-  BSP_LCD_LayerDefaultInit(0, LCD_FB_START_ADDRESS);
-  BSP_LCD_LayerDefaultInit(1, LCD_FB_START_ADDRESS+ BSP_LCD_GetXSize()*BSP_LCD_GetYSize()*4);
-  BSP_LCD_DisplayOn();
-  BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear((uint32_t)0xFF81CD4B);
-  BSP_LCD_SelectLayer(1);
-  BSP_LCD_Clear(00);
-  BSP_LCD_SetFont(&Font16);
-  BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
-  BSP_LCD_SetBackColor(00);
-
-  BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-
+  initDisplay();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -235,7 +222,22 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void initDisplay()
+{
+  BSP_LCD_Init();
+  BSP_LCD_LayerDefaultInit(0, LCD_FB_START_ADDRESS);
+  BSP_LCD_LayerDefaultInit(1, LCD_FB_START_ADDRESS+ BSP_LCD_GetXSize()*BSP_LCD_GetYSize()*4);
+  BSP_LCD_DisplayOn();
+  BSP_LCD_SelectLayer(0);
+  BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+  BSP_LCD_SelectLayer(1);
+  BSP_LCD_Clear(00);
+  BSP_LCD_SetFont(&Font16);
+  BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+  BSP_LCD_SetBackColor(00);
 
+  BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+}
 /* USER CODE END 4 */
 
 /**
