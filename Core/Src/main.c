@@ -67,6 +67,8 @@ void MX_FREERTOS_Init(void);
 void initDisplay();
 void initSD();
 void initAudio(uint32_t freq);
+
+void readHeader();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -120,7 +122,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   initDisplay();
   initSD();
-  // initAudio(freqAudio);
+  initAudio(freqAudio);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -259,6 +261,11 @@ void initAudio(uint32_t freq)
 	static int init = 0;
 
 	BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2);
+}
+
+void readHeader()
+{
+
 }
 /* USER CODE END 4 */
 
