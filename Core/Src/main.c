@@ -26,7 +26,6 @@
 #include "ltdc.h"
 #include "sai.h"
 #include "sdmmc.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
@@ -35,6 +34,7 @@
 /* USER CODE BEGIN Includes */
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
+#include "stm32746g_discovery_audio.h"
 #include "stdio.h"
 /* USER CODE END Includes */
 
@@ -64,6 +64,8 @@ void PeriphCommonClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 void initDisplay();
+void initSD();
+void initAudio(uint32_t freq);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -108,7 +110,6 @@ int main(void)
   MX_DMA2D_Init();
   MX_FMC_Init();
   MX_LTDC_Init();
-  MX_TIM5_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   MX_SAI2_Init();
@@ -117,6 +118,8 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   initDisplay();
+  initSD();
+  initAudio();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -237,6 +240,24 @@ void initDisplay()
   BSP_LCD_SetBackColor(00);
 
   BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+}
+
+void initSD()
+{
+	if (f_mount(&SDFatFS, (TCHAR const*)SDPath, 0) != FR_OK) {
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD not mounted", CENTER_MODE);
+		Error_Handler();
+	}
+	else {
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD mounted", CENTER_MODE);
+	}
+}
+
+void initAudio(uint32_t freq)
+{
+	static int init = 0;
+
+	BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, Audio_bit_res, Audio_chan);
 }
 /* USER CODE END 4 */
 
