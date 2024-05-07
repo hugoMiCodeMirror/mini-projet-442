@@ -45,6 +45,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define AUDIO_BLOCK_SIZE ((uint32_t)512)
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,6 +59,9 @@
 /* USER CODE BEGIN PV */
 ADC_ChannelConfTypeDef sConfig = {0};
 uint32_t freqAudio;
+
+uint32_t Nb_Bloc = 0;
+uint32_t Nb_octets_seconde = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,7 +127,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   initDisplay();
   initSD();
-  initAudio(freqAudio);
+  readHeader();
+  // initAudio(freqAudio);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -260,7 +266,11 @@ void initAudio(uint32_t freq)
 {
 	static int init = 0;
 
-	BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2);
+	if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2) != AUDIO_OK) {
+		Error_Handler();
+	}
+
+	memset((uint16_t*) AUDIO_BUFFER_OUT, 0, AUDIO_BLOCK_SIZE*2);
 }
 
 void readHeader()
@@ -277,14 +287,14 @@ void readHeader()
 //	taille_fichier=((data|MASK_32_TO_8_0)<<24)|((data|MASK_32_TO_8_1)<<8)|((data|MASK_32_TO_8_2)>>8)|((data|MASK_32_TO_8_3)>>24);
 	taille_octet=data;
 	nb_bl=data/512;
-	NB_Bloc=(uint32_t)nb_bl;
+	Nb_Bloc=(uint32_t)nb_bl;
 	data=0;
 
 	//Lecture de la fréquence d'échantillonnage
 	f_lseek(&SDFile,24);
 	f_read(&SDFile, &data, 4 , (void*) &bytesread);
 //	freq=((data2|MASK_32_TO_8_0)<<24)|((data2|MASK_32_TO_8_1)<<8)|((data2|MASK_32_TO_8_2)>>8)|((data2|MASK_32_TO_8_3)>>24);
-	freq_audio=data;
+	freqAudio=data;
 
 	//Nombre d'octets par secondes
 	f_lseek(&SDFile,28);
