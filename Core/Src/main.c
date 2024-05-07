@@ -284,6 +284,8 @@ void initAudio(uint32_t freq)
 {
 	static int init = 0;
 
+	// Block ici va savoir pourquoi
+	// verifier les paramettres
 	if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2) != AUDIO_OK) {
 		Error_Handler();
 	}
