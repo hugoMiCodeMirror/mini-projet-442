@@ -13,6 +13,10 @@ RM := rm -rf
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
+-include Middlewares/Third_Party/FatFs/src/option/subdir.mk
+-include Middlewares/Third_Party/FatFs/src/subdir.mk
+-include FATFS/Target/subdir.mk
+-include FATFS/App/subdir.mk
 -include Drivers/STM32F7xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -64,8 +68,8 @@ all: main-build
 main-build: mini-projet-442.elf secondary-outputs
 
 # Tool invocations
-mini-projet-442.elf mini-projet-442.map: $(OBJS) $(USER_OBJS) C:\Users\Hugo\Repositories\ENS\442\mini-projet-442\STM32F746NGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "mini-projet-442.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Hugo\Repositories\ENS\442\mini-projet-442\STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="mini-projet-442.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+mini-projet-442.elf mini-projet-442.map: $(OBJS) $(USER_OBJS) /home/hugo/Repositories/ENS/442/mini-projet-442/STM32F746NGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "mini-projet-442.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/hugo/Repositories/ENS/442/mini-projet-442/STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="mini-projet-442.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
