@@ -1991,36 +1991,28 @@ void StartTsHandler(void const *argument)
  * @retval None
  */
 /* USER CODE END Header_StartPlaySongTask */
-void StartPlaySongTask(void const *argument)
-{
-	/* USER CODE BEGIN StartPlaySongTask */
-	char i;
-	uint32_t bytesread;
-	/* Infinite loop */
-	for (;;)
-	{
-		xQueueReceive(WakeUpHandle, &i, portMAX_DELAY);
-		if (i == 0)
-		{
-			if (blockPointer++ == numberOfBlocks - 1)
-			{
-				loadWav();
-			}
-			// On lit un bloc de 512 octets
-			f_read(&SDFile, ((uint8_t *)AUDIO_BUFFER_OUT), AUDIO_BLOCK_SIZE, (void *)&bytesread);
-		}
-		else
-		{
-			if (blockPointer++ == numberOfBlocks - 1)
-			{
-				loadWav();
-			}
-			// On lit un bloc de 512 octets
-			f_read(&SDFile, ((uint8_t *)AUDIO_BUFFER_OUT + AUDIO_BLOCK_SIZE), AUDIO_BLOCK_SIZE, (void *)&bytesread);
-		}
-	}
-	/* USER CODE END StartPlaySongTask */
+void StartPlaySongTask(void const *argument) {
+    char i;
+    uint32_t bytesread;
+    
+    /* Infinite loop */
+    for (;;) {
+        // On attend le signal de réveil
+        xQueueReceive(WakeUpHandle, &i, portMAX_DELAY);
+        
+        // On arrive ici si la musique est terminée
+        if (blockPointer++ == numberOfBlocks - 1) {
+            loadWav();
+        }
+        
+        // On détermine la position du buffer à remplir
+        uint8_t *bufferPosition = (i == 0) ? AUDIO_BUFFER_OUT : (AUDIO_BUFFER_OUT + AUDIO_BLOCK_SIZE);
+        
+        // On lit le bloc de données
+        f_read(&SDFile, bufferPosition, AUDIO_BLOCK_SIZE, (void *)&bytesread);
+    }
 }
+
 
 /**
  * @brief  Period elapsed callback in non blocking mode

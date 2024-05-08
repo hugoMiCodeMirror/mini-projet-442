@@ -1,63 +1,34 @@
-# Projet_nintendo
+# Snake Game
 
-## Objectif : 
-Créer un jeu video sur STM32 inspiré des licenses Pokemon et Zelda
+## Objectif
+Créer un jeu classique de serpent (snake) avec une progression de la vitesse du serpent au fil du temps.
 
-## Principe :  
-Le joueur (LINK) se déplace sur une carte sur laquelle il peut croiser des pokemons et les combattre. L'objectif du joueur est de rassembler les fragments de la triforce pour vaincre Ganondorf.
+## Principe
+Le jeu consiste à contrôler un serpent qui se déplace sur un tableau de jeu. Le serpent doit manger des pommes pour grandir. Cependant, si le serpent se heurte à lui-même ou aux bords de l'écran, la partie est terminée.
 
-## Controles :
-- joystick pour se déplacer et déplacer le curseur lors des choix
-- bp1 pour sélectionner et interragir
-- bp2 pour ouvrir le menu
+## Contrôles
+- Utilisation du joystick pour déplacer le serpent.
+- Utilisation de l'écran tactile pour redémarrer le jeu après la fin de la partie et mettre en pause la partie en cours.
 
-## Contenu  : 
-- 5 cartes différentes (gestion des murs et interactions avec les objets)
-
-![map1](https://github.com/Coline3003/Projet_nintendo/assets/116337158/d1932ed6-69c1-4684-bf36-43cd2a4e02e5)
-
-- 8 Pokémons différents capturables + un boss
-- 2 types d'objets : les potions et les fragments de la triforce
-- Le joueur peut posséder jusqu'a 4 pokemons
-- Combat contre les pokemons en tour par tour avec la possibilité de changer de pokemon à la place d'attaquer
-
-![im2](https://github.com/Coline3003/Projet_nintendo/assets/116337158/472b7f26-7dc0-4d71-929a-2428a2375801)
-
-
-- menu pour la gestion de la position des pokemons dans l'équipe et l'utilisation des potions (c'est le premier pokemon de l'équipe qui est automatiquement sélectionné lors du lancement d'un combat)
-
-![im1](https://github.com/Coline3003/Projet_nintendo/assets/116337158/e21f79dc-cb6b-46bf-a59e-00f425e9530e)
-
-
-- 4 types de pokemons (normal, feu, eau, plante)
-- gestion des degats (prise en compte des statistiques du pokemon, de son type, du choix de l'attaque, de son niveau, des statistique du pokemon adverse, du type du pokemon adverse)
-- gestion de l'expérience acquise lors des combat (monté de niveau des pokemons)
-- 3 musiques (une pour la séquence de démarrage, une pour le déplacement sur la carte et une pour les combats)
-
-## Ressource STM32 utilisées :
-
+## Ressources STM32 Utilisées
 ### Périphériques
+- GPIO pour la lecture des valeurs du joystick.
+- SAI (Serial Audio Interface) pour la gestion du son, utilisé avec la bibliothèque BSP_AUDIO.
+- Écran LCD via la bibliothèque BSP_LCD.
 
-- GPIO pour la lecture des valeurs des boutons et du joystick
-- SAI pour la gestion du son, utilisé avec la bibiliothèque BSP_AUDIO
-- Ecran via la bibliothèque BSP_LCD
-
-### FreeRTOS 
-
-Utilisation des tâches, des fils d'attentes, interruptions ...
-
-![diagramme](https://github.com/Coline3003/Projet_nintendo/assets/116337158/e114918d-ee91-4907-933f-e5b9c512a4af)
+### FreeRTOS
+Utilisation des fonctionnalités de FreeRTOS :
+- Tâches pour organiser les différentes parties du code.
+- Files d'attente pour le réveil des tâches.
+- Interruptions pour gérer les événements externes.
+- Mutex pour la gestion des ressources partagées.
 
 ### FATFS
+Lecture des fichiers audio au format .WAV grâce à la bibliothèque FATFS.
 
-- Lecture des images au format .BMP pour le fond
-- Lecture des fichiers audio au format .WAV
-
-## Possibilités d'amélioration/poursuite du projet
-
-- Ajout de contenu (pokemons, dresseurs adverses)
-- Ajout d'une communication entre cartes pour faire des combats entre deux joueurs
-          
-# Lien vers les fichiers à placer dans la carte SD
-
-https://drive.google.com/drive/folders/1-GaNGr_gw7rjtlrhfnCmD15vSxsM8FSb?usp=sharing
+## Utilisation
+1. Mettez les fichiers audio sur la carte SD présente dans le dossier Ressources du projet.
+2. Insérez la carte SD dans le lecteur de la carte STM32.
+3. Branchez un casque pour profiter de l'expérience sonore.
+4. Utilisez le joystick pour déplacer le serpent et collecter des pommes.
+5. Utilisez l'écran tactile pour redémarrer le jeu ou mettre en pause la partie en cours.

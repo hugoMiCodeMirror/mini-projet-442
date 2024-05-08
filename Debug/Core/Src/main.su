@@ -29,6 +29,6 @@
 ../Core/Src/main.c:1492:6:StartDisplayTask	336	static
 ../Core/Src/main.c:1672:6:StartManageBodyParts	72	static
 ../Core/Src/main.c:1936:6:StartTsHandler	16	static
-../Core/Src/main.c:1994:6:StartPlaySongTask	24	static
-../Core/Src/main.c:2033:6:HAL_TIM_PeriodElapsedCallback	16	static
-../Core/Src/main.c:2051:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:1994:6:StartPlaySongTask	32	static
+../Core/Src/main.c:2025:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:2043:6:Error_Handler	4	static,ignoring_inline_asm
