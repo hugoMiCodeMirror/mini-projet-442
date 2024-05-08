@@ -4,7 +4,7 @@
 Créer un jeu classique de serpent (snake) avec une progression de la vitesse du serpent au fil du temps.
 
 ## Principe
-Le jeu consiste à contrôler un serpent qui se déplace sur un tableau de jeu. Le serpent doit manger des pommes pour grandir. Cependant, si le serpent se heurte à lui-même ou aux bords de l'écran, la partie est terminée.
+Le jeu consiste à contrôler un serpent qui se déplace sur une grille. Le serpent doit manger les pommes pour grandir. Cependant, si le serpent se heurte à lui-même ou aux bords de l'écran, la partie est terminée.
 
 ## Contrôles
 - Utilisation du joystick pour déplacer le serpent.
