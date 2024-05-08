@@ -60,39 +60,17 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define ARBG8888_BYTE_PER_PIXEL 4
-
-/**
- * @brief  SDRAM Write read buffer start address after CAM Frame buffer
- * Assuming Camera frame buffer is of size 640x480 and format RGB565 (16 bits per pixel).
- */
 #define SDRAM_WRITE_READ_ADDR ((uint32_t)(LCD_FB_START_ADDRESS + (RK043FN48H_WIDTH * RK043FN48H_HEIGHT * ARBG8888_BYTE_PER_PIXEL)))
 
-#define SDRAM_WRITE_READ_ADDR_OFFSET ((uint32_t)0x0800)
-#define SRAM_WRITE_READ_ADDR_OFFSET SDRAM_WRITE_READ_ADDR_OFFSET
-
 #define AUDIO_REC_START_ADDR SDRAM_WRITE_READ_ADDR
-
 #define AUDIO_BLOCK_SIZE ((uint32_t)512)
-#define AUDIO_BUFFER_IN AUDIO_REC_START_ADDR							 /* In SDRAM */
-#define AUDIO_BUFFER_OUT (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 2)) /* In SDRAM */
-#define AUDIO_BUFFER_READ (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 4))
-#define AUDIO_BUFFER_POST (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 6))
-
-#define Audio_freq 48000
-#define Audio_bit_res DEFAULT_AUDIO_IN_BIT_RESOLUTION // 16
-#define Audio_chan DEFAULT_AUDIO_IN_CHANNEL_NBR		  // 2
-#define BytePerBloc ((uint16_t)Audio_bit_res * Audio_chan / 8)
-#define BytePerSec ((uint32_t)BytePerBloc * Audio_freq)
-
-#define MASK_32_TO_8_0 0x000000FF
-#define MASK_32_TO_8_1 0x0000FF00
-#define MASK_32_TO_8_2 0x00FF0000
-#define MASK_32_TO_8_3 0xFF000000
-
-#define MAX_MUSIQUE 6
+#define AUDIO_BUFFER_OUT (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 2))
 
 #define Song_Name (const TCHAR *)"song.WAV"
-
+#define NB_APPLES 4
+#define NB_PALIERS 4
+#define GRID_SIZE_X 15
+#define GRID_SIZE_Y 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -130,7 +108,11 @@ osThreadId playSongTaskHandle;
 osMessageQId WakeUpHandle;
 osMutexId displayMutexHandle;
 /* USER CODE BEGIN PV */
-uint32_t NB_Bloc = 0, Bloc_Cursor = 0, freq_audio, Nb_octets_seconde = 1;
+uint32_t numberOfBlocks = 0;
+uint32_t blockPointer = 0;
+uint32_t audioFrequency = 44100;
+uint32_t bytesPerSecond = 1;
+
 char *pDirectoryFiles[MAX_BMP_FILES];
 uint8_t *uwInternelBuffer; // Buffer pour la mémoire SDRAM
 uint8_t *uwInternelBuffer2;
@@ -139,11 +121,8 @@ static TS_StateTypeDef TS_State;
 uint32_t screenPressed = 0;
 uint32_t screenReleased = 0;
 
-const uint8_t gridSizeX = 15;
-const uint8_t gridSizeY = 8;
-const uint8_t NBApple = 4;
-const uint8_t initSpeed = 3; // Fréquence de rafraîchissement en Hz
-const uint8_t palierIncreaseSpeed[5] = {4, 12, 22, 50, 75};
+const uint8_t initSpeed = 2; // Fréquence de rafraîchissement en Hz
+const uint8_t palierIncreaseSpeed[NB_PALIERS] = {4, 12, 22, 50};
 
 uint8_t speed = initSpeed;
 
@@ -178,7 +157,7 @@ enum BodyPart
 	LeftTop,
 	RightTop
 };
-enum BodyPart snakeBodyParts[15 * 8];
+enum BodyPart snakeBodyParts[GRID_SIZE_X * GRID_SIZE_Y];
 
 enum TailPart
 {
@@ -197,10 +176,10 @@ uint32_t gameOver = 0;
 uint32_t lastMove = 1; // dernier déplacement du snake avant la mort
 
 uint8_t snakeHeadPosition[2] = {7, 6};
-uint8_t snakeBodyPosition[15 * 8][2] = {};
+uint8_t snakeBodyPosition[GRID_SIZE_X * GRID_SIZE_Y][2] = {};
 uint8_t snakeTailPosition[2] = {7, 7};
 uint8_t oldTailPosition[2];
-int8_t applePosition[4][2];
+int8_t applePosition[NB_APPLES][2];
 
 /* USER CODE END PV */
 
@@ -231,6 +210,7 @@ void StartPlaySongTask(void const *argument);
 /* USER CODE BEGIN 0 */
 enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_t backY, uint8_t missingX, uint8_t missingY)
 {
+	// Cette fonction permet de déterminer le type de partie du corps du snake en fonction de la position de celle de devant et de celle de derrière
 	/*
 	  . F .
 	  . X .
@@ -299,7 +279,7 @@ enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_
 			return RightTop;
 	}
 
-	return BottomTop; // should never happen
+	return BottomTop; // ne devrait jamais arriver
 }
 
 uint8_t isSnakePosition(uint8_t x, uint8_t y)
@@ -321,7 +301,7 @@ uint8_t isSnakePosition(uint8_t x, uint8_t y)
 
 uint8_t isApplePosition(uint8_t x, uint8_t y, uint8_t appleIndex)
 {
-	for (int i = 0; i < NBApple; i++)
+	for (int i = 0; i < NB_APPLES; i++)
 	{
 		if (i == appleIndex)
 			continue;
@@ -335,12 +315,11 @@ uint8_t isApplePosition(uint8_t x, uint8_t y, uint8_t appleIndex)
 
 void updateJoystickDirection()
 {
-	// config de la récupération des valeurs du joystick
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Rank = ADC_REGULAR_RANK_1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-	// recuperation valeur joystick
 	sConfig.Channel = ADC_CHANNEL_8;
+
 	HAL_ADC_ConfigChannel(&hadc3, &sConfig);
 	HAL_ADC_Start(&hadc3);
 	while (HAL_ADC_PollForConversion(&hadc3, 100) != HAL_OK)
@@ -352,6 +331,7 @@ void updateJoystickDirection()
 		;
 	joystick_h = HAL_ADC_GetValue(&hadc1);
 
+	// On actualise la direction du snake
 	if (joystick_v < 1000 && headPart != HeadTop)
 	{
 		direction = Down;
@@ -384,12 +364,12 @@ void restartGame()
 	headPart = HeadTop;
 	tailPart = TailTop;
 
-	for (int i = 0; i < NBApple; i++)
+	for (int i = 0; i < NB_APPLES; i++)
 	{
 		do
 		{
-			applePosition[i][0] = rand() % gridSizeX;
-			applePosition[i][1] = rand() % gridSizeY;
+			applePosition[i][0] = rand() % GRID_SIZE_X;
+			applePosition[i][1] = rand() % GRID_SIZE_Y;
 		} while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
 	}
 
@@ -398,6 +378,7 @@ void restartGame()
 
 void displayGameStatus()
 {
+	// On affiche le texte en fonction de l'état du jeu
 	if (gameOver)
 	{
 		BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
@@ -424,117 +405,70 @@ void displayGameStatus()
 	}
 }
 
-void SD_Init()
+void initializeSD()
 {
 	if (f_mount(&SDFatFS, (TCHAR const *)SDPath, 0) != FR_OK)
 	{
 		Error_Handler();
 	}
-	else
-	{
-		BSP_LCD_DisplayStringAt(0, 40, (uint8_t *)"SD - Mount Ok", CENTER_MODE);
-	}
 }
 
-void Audio_Init(uint32_t freq)
+void initializeAudio(uint32_t freq)
 {
-	static int init = 0;
+	// Initialisation de l'audio
 	if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1,
 							  OUTPUT_DEVICE_HEADPHONE, freq,
-							  Audio_bit_res,
-							  Audio_chan) == AUDIO_OK)
+							  DEFAULT_AUDIO_IN_BIT_RESOLUTION,
+							  DEFAULT_AUDIO_IN_CHANNEL_NBR) != AUDIO_OK)
 	{
-		if (init == 0)
-		{
-			// BSP_LCD_DisplayStringAt(0, 20, (uint8_t*) "Init Audio - OK",CENTER_MODE);
-		}
+		Error_Handler();
 	}
 
-	/* Initialize SDRAM buffers */
-	//	memset((uint16_t*) AUDIO_BUFFER_IN, 0, AUDIO_BLOCK_SIZE * 2);
+	// Initialisation du buffer audio
 	memset((uint16_t *)AUDIO_BUFFER_OUT, 0, AUDIO_BLOCK_SIZE * 2);
-	//	memset((uint16_t*) AUDIO_BUFFER_READ, 0, AUDIO_BLOCK_SIZE * 2);
 
-	/* Start Recording */
+	// Démarrage de l'audio
 	BSP_AUDIO_OUT_SetVolume(40);
-	/* Start Playback */
 	BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
+
 	if (BSP_AUDIO_OUT_Play((uint16_t *)AUDIO_BUFFER_OUT,
-						   AUDIO_BLOCK_SIZE * 2) == AUDIO_OK)
+						   AUDIO_BLOCK_SIZE * 2) != AUDIO_OK)
 	{
-
-		if (init == 0)
-		{
-			// sprintf(text,"Aud_freq= %u",(int)freq);
-			init = 1;
-		}
+		Error_Handler();
 	}
 }
 
-void LCD_Init()
-{
-	BSP_LCD_Init();
-	BSP_LCD_LayerDefaultInit(0, LCD_FB_START_ADDRESS);
-	BSP_LCD_LayerDefaultInit(1,
-							 LCD_FB_START_ADDRESS + BSP_LCD_GetXSize() * BSP_LCD_GetYSize() * 4);
-	BSP_LCD_DisplayOn();
-	BSP_LCD_SelectLayer(1);
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
-	BSP_LCD_SetFont(&Font12);
-	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-	BSP_LCD_SetTextColor(LCD_COLOR_LIGHTBLUE);
-	if (BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize()) != TS_OK)
-	{
-		BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-		BSP_LCD_SetTextColor(LCD_COLOR_RED);
-		BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 95, (uint8_t *)"ERROR",
-								CENTER_MODE);
-		BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 80,
-								(uint8_t *)"Touchscreen cannot be initialized", CENTER_MODE);
-	}
-	else
-	{
-		BSP_LCD_DisplayStringAt(0, 10, (uint8_t *)"Init Ecran - OK",
-								CENTER_MODE);
-	}
-}
-
-void read_header()
+void extractHeaderInfo()
 {
 	uint32_t data = 0;
-	uint32_t nb_bl;
 	uint32_t bytesread;
-	uint32_t taille_octet;
 
-	// Lecture du nombre d'octets
+	// Lecture de la taille du fichier
 	f_lseek(&SDFile, 04);
 	f_read(&SDFile, &data, 4, (void *)&bytesread);
-	//	taille_fichier=((data|MASK_32_TO_8_0)<<24)|((data|MASK_32_TO_8_1)<<8)|((data|MASK_32_TO_8_2)>>8)|((data|MASK_32_TO_8_3)>>24);
-	taille_octet = data;
-	nb_bl = data / 512;
-	NB_Bloc = (uint32_t)nb_bl;
+	numberOfBlocks = data / 512;
 	data = 0;
 
 	// Lecture de la fréquence d'échantillonnage
 	f_lseek(&SDFile, 24);
 	f_read(&SDFile, &data, 4, (void *)&bytesread);
-	//	freq=((data2|MASK_32_TO_8_0)<<24)|((data2|MASK_32_TO_8_1)<<8)|((data2|MASK_32_TO_8_2)>>8)|((data2|MASK_32_TO_8_3)>>24);
-	freq_audio = data;
+	audioFrequency = data;
+	data = 0;
 
 	// Nombre d'octets par secondes
 	f_lseek(&SDFile, 28);
 	f_read(&SDFile, (uint8_t *)&data, 4, (void *)&bytesread);
-	Nb_octets_seconde = data;
+	bytesPerSecond = data;
 }
 
-void Charge_Wave()
+void loadWav()
 {
 	f_close(&SDFile);
 	f_open(&SDFile, Song_Name, FA_READ);
-	read_header();
-	Audio_Init(freq_audio);
+	extractHeaderInfo();
+	initializeAudio(audioFrequency);
 	f_lseek(&SDFile, 44);
-	Bloc_Cursor = 0;
+	blockPointer = 0;
 }
 /* USER CODE END 0 */
 
@@ -598,10 +532,7 @@ int main(void)
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
 	BSP_LCD_SetBackColor(00);
-
 	BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-
-	Audio_Init(Audio_freq);
 	/* USER CODE END 2 */
 
 	/* Create the mutex(es) */
@@ -1590,8 +1521,8 @@ void StartDisplayTask(void const *argument)
 	}
 
 	// Lancement de la musique
-	SD_Init();
-	Charge_Wave(0);
+	initializeSD();
+	loadWav(0);
 
 	vTaskResume(manageBodyPartsHandle);
 	vTaskResume(tsHandlerTaskHandle);
@@ -1709,15 +1640,15 @@ void StartDisplayTask(void const *argument)
 			if (!appleEaten && (snakeHeadPosition[0] != oldTailPosition[0] || snakeHeadPosition[1] != oldTailPosition[1]))
 			{
 				// On efface l'ancienne queue si:
-				//    - le snake a avancé (la queue n'est pas restée à la même position)
-				// ou
-				//    - la tête n'est pas à la position de l'ancienne queue (le snake suit sa queue)
+				//    - le snake a avancé et n'a pas mangé de pomme
+				// et
+				//    - la tête n'est pas à la position de l'ancienne queue (sinon on efface la tête)
 				BSP_LCD_SetTextColor((uint32_t)0xFF81CD4B); // 0xFF81CD4B
 				BSP_LCD_FillRect(oldTailPosition[0] * 32, oldTailPosition[1] * 32, 32, 32);
 			}
 
 			// On affiche les pommes
-			for (int i = 0; i < NBApple; i++)
+			for (int i = 0; i < NB_APPLES; i++)
 				if (applePosition[i][0] != -1)
 					BSP_LCD_DrawBitmap(applePosition[i][0] * 32, applePosition[i][1] * 32, (uint8_t *)images_bmp_color_apple_81CD4B_bmp);
 			xSemaphoreGive(displayMutexHandle);
@@ -1783,7 +1714,7 @@ void StartManageBodyParts(void const *argument)
 			}
 
 			// on vérifie si on est mort
-			if (snakeHeadPosition[0] >= gridSizeX || snakeHeadPosition[1] >= gridSizeY || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0)
+			if (snakeHeadPosition[0] >= GRID_SIZE_X || snakeHeadPosition[1] >= GRID_SIZE_Y || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0)
 			{
 				// On a touché un mur
 				gameOver = 1;
@@ -1803,7 +1734,7 @@ void StartManageBodyParts(void const *argument)
 
 			// On vérifie si on a mangé la pomme avant de bouger le corps et la queue
 			appleEaten = 0;
-			for (int i = 0; i < NBApple; i++)
+			for (int i = 0; i < NB_APPLES; i++)
 			{
 				if (snakeHeadPosition[0] == applePosition[i][0] && snakeHeadPosition[1] == applePosition[i][1])
 				{
@@ -1811,7 +1742,7 @@ void StartManageBodyParts(void const *argument)
 					appleEaten = 1;
 
 					// On augmente la vitesse de 1Hz a chaque palier
-					for (int i = 0; i < 5; i++)
+					for (int i = 0; i < NB_PALIERS; i++)
 					{
 						if (snakeSize == palierIncreaseSpeed[i])
 						{
@@ -1849,14 +1780,14 @@ void StartManageBodyParts(void const *argument)
 					snakeBodyPosition[0][1] = oldHeadPosition[1];
 
 					// Si on a de la place pour une nouvelle pomme
-					uint8_t NBFreeCells = gridSizeX * gridSizeY - snakeSize - 1;
-					if (NBFreeCells > NBApple)
+					uint8_t NBFreeCells = GRID_SIZE_X * GRID_SIZE_Y - snakeSize - 1;
+					if (NBFreeCells > NB_APPLES)
 					{
 						// On génère une nouvelle pomme à une position aléatoire qui n'est pas sur le snake ou une autre pomme
 						do
 						{
-							applePosition[i][0] = rand() % gridSizeX;
-							applePosition[i][1] = rand() % gridSizeY;
+							applePosition[i][0] = rand() % GRID_SIZE_X;
+							applePosition[i][1] = rand() % GRID_SIZE_Y;
 						} while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
 					}
 					else
@@ -2065,40 +1996,27 @@ void StartPlaySongTask(void const *argument)
 	/* USER CODE BEGIN StartPlaySongTask */
 	char i;
 	uint32_t bytesread;
-	uint32_t taille_octet;
 	/* Infinite loop */
 	for (;;)
 	{
 		xQueueReceive(WakeUpHandle, &i, portMAX_DELAY);
 		if (i == 0)
 		{
-			if (Bloc_Cursor++ == NB_Bloc - 1)
-			{ // fin de musique
-				f_close(&SDFile);
-				f_open(&SDFile, Song_Name, FA_READ);
-				read_header();
-				Audio_Init(freq_audio);
-				f_lseek(&SDFile, 44);
-				Bloc_Cursor = 0;
+			if (blockPointer++ == numberOfBlocks - 1)
+			{
+				loadWav();
 			}
+			// On lit un bloc de 512 octets
 			f_read(&SDFile, ((uint8_t *)AUDIO_BUFFER_OUT), AUDIO_BLOCK_SIZE, (void *)&bytesread);
-
-			taille_octet = 512 * Bloc_Cursor;
 		}
 		else
 		{
-			if (Bloc_Cursor++ == NB_Bloc - 1)
+			if (blockPointer++ == numberOfBlocks - 1)
 			{
-				f_close(&SDFile);
-				f_open(&SDFile, Song_Name, FA_READ);
-				read_header();
-				Audio_Init(freq_audio);
-				f_lseek(&SDFile, 44);
-				Bloc_Cursor = 0;
+				loadWav();
 			}
+			// On lit un bloc de 512 octets
 			f_read(&SDFile, ((uint8_t *)AUDIO_BUFFER_OUT + AUDIO_BLOCK_SIZE), AUDIO_BLOCK_SIZE, (void *)&bytesread);
-
-			taille_octet = 512 * Bloc_Cursor;
 		}
 	}
 	/* USER CODE END StartPlaySongTask */
