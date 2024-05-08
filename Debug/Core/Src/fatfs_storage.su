@@ -1,0 +1,6 @@
+../Core/Src/fatfs_storage.c:118:10:Storage_Init	8	static
+../Core/Src/fatfs_storage.c:138:10:Storage_OpenReadFile	592	static
+../Core/Src/fatfs_storage.c:209:10:Storage_CheckBitmapFile	16	static
+../Core/Src/fatfs_storage.c:236:10:Storage_GetDirectoryBitmapFiles	24	static
+../Core/Src/fatfs_storage.c:275:10:Storage_GetDirectoryWaveFiles	24	static
+../Core/Src/fatfs_storage.c:319:9:Buffercmp	24	static

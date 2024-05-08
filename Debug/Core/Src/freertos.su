@@ -1,12 +1,4 @@
-../Core/Src/freertos.c:163:6:vApplicationGetIdleTaskMemory	24	static
-../Core/Src/freertos.c:177:6:MX_FREERTOS_Init	168	static
-../Core/Src/freertos.c:236:6:StartDefaultTask	16	static
-../Core/Src/freertos.c:254:6:StartDisplayTask	328	static
-../Core/Src/freertos.c:389:6:StartJoystickTask	16	static
-../Core/Src/freertos.c:428:6:StartManageBodyParts	72	static
-../Core/Src/freertos.c:663:6:StartTsHandlerTask	16	static
-../Core/Src/freertos.c:710:15:whatBodyPart	16	static
-../Core/Src/freertos.c:780:9:isSnakePosition	24	static
-../Core/Src/freertos.c:796:9:isApplePosition	24	static
-../Core/Src/freertos.c:809:6:restartGame	16	static
-../Core/Src/freertos.c:833:6:displayGameStatus	8	static
+../Core/Src/freertos.c:65:13:vApplicationIdleHook	4	static
+../Core/Src/freertos.c:80:13:vApplicationStackOverflowHook	16	static
+../Core/Src/freertos.c:89:13:vApplicationMallocFailedHook	4	static
+../Core/Src/freertos.c:108:6:vApplicationGetIdleTaskMemory	24	static

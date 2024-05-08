@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Hugo/Repositories/ENS/442/mini-projet-442/Core/Src",
-      "program": "c:/Users/Hugo/Repositories/ENS/442/mini-projet-442/Core/Src/build/Debug/outDebug",
+      "cwd": "c:/Users/Hugo/Repositories/ENS/442/Projet_nintendo/Core/Src",
+      "program": "c:/Users/Hugo/Repositories/ENS/442/Projet_nintendo/Core/Src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

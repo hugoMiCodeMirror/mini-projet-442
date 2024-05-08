@@ -31,8 +31,6 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dma2d.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dac.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dac_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sdram.h \
@@ -43,42 +41,13 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_ltdc_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc_ex.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_spi.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_spi_ex.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sai.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sd.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_sdmmc.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../Core/Inc/stm32746g_discovery_lcd.h ../Core/Inc/rk043fn48h.h \
- ../Core/Inc/stm32746g_discovery_sdram.h \
- ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
- ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
- ../Core/Inc/ts.h ../Core/Inc/adc.h ../Core/Inc/main.h \
- ../Core/Inc/Images/images_h/apple_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/left-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/left-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/right-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-right_\#81CD4B.h
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -112,8 +81,6 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dma2d.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dac.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_dac_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sdram.h:
@@ -124,44 +91,10 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_ltdc_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc_ex.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_spi.h:
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_spi_ex.h:
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sai.h:
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sd.h:
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_sdmmc.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
-../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
-../Core/Inc/stm32746g_discovery_lcd.h:
-../Core/Inc/rk043fn48h.h:
-../Core/Inc/stm32746g_discovery_sdram.h:
-../Core/Inc/stm32746g_discovery.h:
-../Core/Inc/../../Fonts/fonts.h:
-../Core/Inc/stm32746g_discovery_ts.h:
-../Core/Inc/ft5336.h:
-../Core/Inc/ts.h:
-../Core/Inc/adc.h:
-../Core/Inc/main.h:
-../Core/Inc/Images/images_h/apple_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/left-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/left-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/right-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-right_\#81CD4B.h:
