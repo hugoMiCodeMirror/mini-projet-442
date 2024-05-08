@@ -1,13 +1,6 @@
-Core/Src/freertos.o: ../Core/Src/freertos.c \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
+Core/Src/fatfs_storage.o: ../Core/Src/fatfs_storage.c \
+ ../Core/Inc/fatfs_storage.h ../Middlewares/Third_Party/FatFs/src/ff.h \
+ ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
  ../Core/Inc/main.h ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
  ../Core/Inc/stm32f7xx_hal_conf.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
@@ -48,7 +41,17 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
+ ../FATFS/Target/bsp_driver_sd.h ../FATFS/Target/fatfs_platform.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
+ ../Core/Inc/FreeRTOSConfig.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
@@ -56,43 +59,11 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
- ../Core/Inc/stm32746g_discovery_lcd.h ../Core/Inc/rk043fn48h.h \
- ../Core/Inc/stm32746g_discovery_sdram.h \
- ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
- ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
- ../Core/Inc/ts.h ../Core/Inc/stm32746g_discovery_audio.h \
- ../Core/Inc/wm8994.h ../Core/Inc/audio.h ../Core/Inc/adc.h \
- ../Core/Inc/main.h ../FATFS/App/fatfs.h \
- ../Middlewares/Third_Party/FatFs/src/ff.h \
- ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
- ../FATFS/Target/bsp_driver_sd.h ../FATFS/Target/fatfs_platform.h \
- ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
- ../Middlewares/Third_Party/FatFs/src/diskio.h \
- ../Middlewares/Third_Party/FatFs/src/ff.h ../FATFS/Target/sd_diskio.h \
- ../Core/Inc/fatfs_storage.h ../Core/Inc/Images/images_h/apple_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/head-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/left-right_\#81CD4B.h \
- ../Core/Inc/Images/images_h/left-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/right-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-top_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-left_\#81CD4B.h \
- ../Core/Inc/Images/images_h/tail-right_\#81CD4B.h
-../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
-../Core/Inc/FreeRTOSConfig.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
-../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
+ ../Core/Inc/main.h ../FATFS/Target/bsp_driver_sd.h
+../Core/Inc/fatfs_storage.h:
+../Middlewares/Third_Party/FatFs/src/ff.h:
+../Middlewares/Third_Party/FatFs/src/integer.h:
+../FATFS/Target/ffconf.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 ../Core/Inc/stm32f7xx_hal_conf.h:
@@ -134,7 +105,18 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
+../FATFS/Target/bsp_driver_sd.h:
+../FATFS/Target/fatfs_platform.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
+../Core/Inc/FreeRTOSConfig.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
+../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
@@ -142,42 +124,5 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
-../Core/Inc/stm32746g_discovery_lcd.h:
-../Core/Inc/rk043fn48h.h:
-../Core/Inc/stm32746g_discovery_sdram.h:
-../Core/Inc/stm32746g_discovery.h:
-../Core/Inc/../../Fonts/fonts.h:
-../Core/Inc/stm32746g_discovery_ts.h:
-../Core/Inc/ft5336.h:
-../Core/Inc/ts.h:
-../Core/Inc/stm32746g_discovery_audio.h:
-../Core/Inc/wm8994.h:
-../Core/Inc/audio.h:
-../Core/Inc/adc.h:
 ../Core/Inc/main.h:
-../FATFS/App/fatfs.h:
-../Middlewares/Third_Party/FatFs/src/ff.h:
-../Middlewares/Third_Party/FatFs/src/integer.h:
-../FATFS/Target/ffconf.h:
 ../FATFS/Target/bsp_driver_sd.h:
-../FATFS/Target/fatfs_platform.h:
-../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
-../Middlewares/Third_Party/FatFs/src/diskio.h:
-../Middlewares/Third_Party/FatFs/src/ff.h:
-../FATFS/Target/sd_diskio.h:
-../Core/Inc/fatfs_storage.h:
-../Core/Inc/Images/images_h/apple_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/head-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/left-right_\#81CD4B.h:
-../Core/Inc/Images/images_h/left-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/right-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-top_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-left_\#81CD4B.h:
-../Core/Inc/Images/images_h/tail-right_\#81CD4B.h:

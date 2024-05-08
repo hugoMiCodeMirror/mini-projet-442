@@ -34,6 +34,7 @@
 #include <stdlib.h>
 
 #include "fatfs.h"
+#include "fatfs_storage.h"
 
 #include "Images/images_h/apple_#81CD4B.h"
 #include "Images/images_h/bottom-left_#81CD4B.h"
@@ -91,6 +92,16 @@ uint32_t Bloc_Cursor = 0;
 uint32_t freqAudio;
 uint32_t Nb_Bloc = 0;
 uint32_t Nb_octets_seconde = 1;
+char *pDirectoryFiles[MAX_BMP_FILES];
+char *pDirectoryWaveFiles[MAX_WAVE_FILES];
+FIL F1;
+uint8_t ubNumberOfFiles = 0;
+uint32_t Debut = 0;
+uint8_t str[30];
+uint8_t *uwInternelBuffer;
+uint8_t sector1[512];
+
+
 
 static TS_StateTypeDef  TS_State;
 uint32_t screenPressed = 0;
@@ -933,6 +944,35 @@ void displayGameStatus()
 
 void initSD()
 {
+  	uint8_t counter;
+
+	/*##- Initialize the Directory Files pointers (heap) ###################*/
+	for (counter = 0; counter < MAX_BMP_FILES; counter++) {
+		pDirectoryFiles[counter] = malloc(MAX_BMP_FILE_NAME);
+		if (pDirectoryFiles[counter] == NULL) {
+			/* Set the Text Color */
+			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+
+			BSP_LCD_DisplayStringAtLine(8,
+					(uint8_t*) "  Cannot allocate memory ");
+
+			while (1) {
+			}
+		}
+
+	}
+
+	/* Get the BMP file names on root directory */
+	ubNumberOfFiles = Storage_GetDirectoryBitmapFiles("/Media",
+			pDirectoryFiles);
+
+    //Chargement de la premiere Zone dans le buffer
+	f_open(&F1, (TCHAR const*) str, FA_READ);
+	f_read(&F1, sector1, 512, (UINT*) &Debut);
+	sprintf((char*) str, "Media/%-11.11s", pDirectoryFiles[0]);
+	Storage_OpenReadFile(uwInternelBuffer, (const char*) str);
+	f_close(&F1);
+
 	if (f_mount(&SDFatFS, (TCHAR const*)SDPath, 0) != FR_OK) {
 		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD not mounted", CENTER_MODE);
 		Error_Handler();
