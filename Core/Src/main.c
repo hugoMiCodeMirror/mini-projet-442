@@ -74,7 +74,7 @@
 
 #define MAX_MUSIQUE 6
 
-#define Song_Name "song.WAV"
+#define Song_Name (const TCHAR *)"song.WAV"
 
 /* USER CODE END PD */
 
@@ -122,18 +122,10 @@ osMessageQId QueueAtoCHandle;
 osMessageQId QueueCtoAHandle;
 osMessageQId QueueC1toAHandle;
 /* USER CODE BEGIN PV */
-
 uint32_t NB_Bloc = 0, Bloc_Cursor = 0, freq_audio, Nb_octets_seconde = 1;
-
 char *pDirectoryFiles[MAX_BMP_FILES];
-char *pDirectoryWaveFiles[MAX_WAVE_FILES];
-uint8_t ubNumberOfFiles = 0;
-uint32_t uwBmplen = 0;
 uint8_t *uwInternelBuffer; // Buffer pour la mémoire SDRAM
 uint8_t *uwInternelBuffer2;
-FIL F1;
-uint8_t str[30];
-uint32_t joystick_h, joystick_v;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -241,7 +233,6 @@ void LCD_Init()
 
 void read_header()
 {
-
 	uint32_t data = 0;
 	uint32_t nb_bl;
 	uint32_t bytesread;
@@ -270,7 +261,6 @@ void read_header()
 
 void Charge_Wave()
 {
-
 	f_close(&SDFile);
 	f_open(&SDFile, Song_Name, FA_READ);
 	read_header();
@@ -1446,7 +1436,6 @@ void Demarrage(void const *argument)
 			}
 		}
 	}
-
 
 	// Lancement de la musique
 	SD_Init();
