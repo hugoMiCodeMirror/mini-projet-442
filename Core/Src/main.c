@@ -66,7 +66,10 @@
 #define AUDIO_BLOCK_SIZE ((uint32_t)512)
 #define AUDIO_BUFFER_OUT (AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE * 2))
 
-#define Song_Name (const TCHAR *)"song.WAV"
+#define NB_SONGS 3
+#define SONG1 (const TCHAR *)"song1.WAV"
+#define SONG2 (const TCHAR *)"song2.WAV"
+#define SONG3 (const TCHAR *)"song3.WAV"
 #define NB_APPLES 4
 #define NB_PALIERS 4
 #define GRID_SIZE_X 15
@@ -112,6 +115,7 @@ uint32_t numberOfBlocks = 0;
 uint32_t blockPointer = 0;
 uint32_t audioFrequency = 44100;
 uint32_t bytesPerSecond = 1;
+uint32_t currentSong = 0;
 
 char *pDirectoryFiles[MAX_BMP_FILES];
 uint8_t *uwInternelBuffer; // Buffer pour la mémoire SDRAM
@@ -464,11 +468,18 @@ void extractHeaderInfo()
 void loadWav()
 {
 	f_close(&SDFile);
-	f_open(&SDFile, Song_Name, FA_READ);
+	if (currentSong == 0)
+		f_open(&SDFile, SONG1, FA_READ);
+	else if (currentSong == 1)
+		f_open(&SDFile, SONG2, FA_READ);
+	else if (currentSong == 2)
+		f_open(&SDFile, SONG3, FA_READ);
+		
 	extractHeaderInfo();
 	initializeAudio(audioFrequency);
 	f_lseek(&SDFile, 44);
 	blockPointer = 0;
+	currentSong = (currentSong + 1) % NB_SONGS;
 }
 /* USER CODE END 0 */
 
