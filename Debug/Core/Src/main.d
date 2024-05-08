@@ -68,7 +68,22 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
  ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
  ../Core/Inc/ts.h ../Core/Inc/stm32746g_discovery_audio.h \
- ../Core/Inc/wm8994.h ../Core/Inc/audio.h ../Core/Inc/fatfs_storage.h
+ ../Core/Inc/wm8994.h ../Core/Inc/audio.h ../Core/Inc/fatfs_storage.h \
+ ../Core/Inc/Images/images_h/apple_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/head-top_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/head-left_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/head-right_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/left-right_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/left-top_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/right-top_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/tail-top_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/tail-left_\#81CD4B.h \
+ ../Core/Inc/Images/images_h/tail-right_\#81CD4B.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 ../Core/Inc/stm32f7xx_hal_conf.h:
@@ -151,3 +166,18 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/wm8994.h:
 ../Core/Inc/audio.h:
 ../Core/Inc/fatfs_storage.h:
+../Core/Inc/Images/images_h/apple_\#81CD4B.h:
+../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h:
+../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h:
+../Core/Inc/Images/images_h/bottom-top_\#81CD4B.h:
+../Core/Inc/Images/images_h/head-bottom_\#81CD4B.h:
+../Core/Inc/Images/images_h/head-top_\#81CD4B.h:
+../Core/Inc/Images/images_h/head-left_\#81CD4B.h:
+../Core/Inc/Images/images_h/head-right_\#81CD4B.h:
+../Core/Inc/Images/images_h/left-right_\#81CD4B.h:
+../Core/Inc/Images/images_h/left-top_\#81CD4B.h:
+../Core/Inc/Images/images_h/right-top_\#81CD4B.h:
+../Core/Inc/Images/images_h/tail-bottom_\#81CD4B.h:
+../Core/Inc/Images/images_h/tail-top_\#81CD4B.h:
+../Core/Inc/Images/images_h/tail-left_\#81CD4B.h:
+../Core/Inc/Images/images_h/tail-right_\#81CD4B.h:

@@ -33,6 +33,23 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include "Images/images_h/apple_#81CD4B.h"
+#include "Images/images_h/bottom-left_#81CD4B.h"
+#include "Images/images_h/bottom-right_#81CD4B.h"
+#include "Images/images_h/bottom-top_#81CD4B.h"
+#include "Images/images_h/head-bottom_#81CD4B.h"
+#include "Images/images_h/head-top_#81CD4B.h"
+#include "Images/images_h/head-left_#81CD4B.h"
+#include "Images/images_h/head-right_#81CD4B.h"
+#include "Images/images_h/left-right_#81CD4B.h"
+#include "Images/images_h/left-top_#81CD4B.h"
+#include "Images/images_h/right-top_#81CD4B.h"
+#include "Images/images_h/tail-bottom_#81CD4B.h"
+#include "Images/images_h/tail-top_#81CD4B.h"
+#include "Images/images_h/tail-left_#81CD4B.h"
+#include "Images/images_h/tail-right_#81CD4B.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,27 +122,86 @@ UART_HandleTypeDef huart1;
 SDRAM_HandleTypeDef hsdram1;
 SDRAM_HandleTypeDef hsdram2;
 
-osThreadId Play_wavHandle;
-osThreadId task_Affich_PicHandle;
-osThreadId task_deplacementHandle;
-osThreadId task_chgZoneHandle;
-osThreadId task_DemarrageHandle;
-osThreadId task_combatHandle;
-osThreadId task_deplac_pokHandle;
+osThreadId defaultTaskHandle;
+osThreadId displayTaskHandle;
+osThreadId manageBodyPartsHandle;
+osThreadId tsHandlerTaskHandle;
+osThreadId playSongTaskHandle;
 osMessageQId WakeUpHandle;
-osMessageQId QueueP1toAHandle;
-osMessageQId QueueP2toAHandle;
-osMessageQId QueueP3toAHandle;
-osMessageQId QueueAtoPHandle;
-osMessageQId QueueOtoAHandle;
-osMessageQId QueueAtoCHandle;
-osMessageQId QueueCtoAHandle;
-osMessageQId QueueC1toAHandle;
+osMutexId displayMutexHandle;
 /* USER CODE BEGIN PV */
 uint32_t NB_Bloc = 0, Bloc_Cursor = 0, freq_audio, Nb_octets_seconde = 1;
 char *pDirectoryFiles[MAX_BMP_FILES];
 uint8_t *uwInternelBuffer; // Buffer pour la mémoire SDRAM
 uint8_t *uwInternelBuffer2;
+
+static TS_StateTypeDef TS_State;
+uint32_t screenPressed = 0;
+uint32_t screenReleased = 0;
+
+const uint8_t gridSizeX = 15;
+const uint8_t gridSizeY = 8;
+const uint8_t NBApple = 4;
+const uint8_t initSpeed = 3; // Fréquence de rafraîchissement en Hz
+const uint8_t palierIncreaseSpeed[5] = {4, 12, 22, 50, 75};
+
+uint8_t speed = initSpeed;
+
+uint32_t joystick_v;
+uint32_t joystick_h;
+extern ADC_ChannelConfTypeDef sConfig;
+
+enum Direction
+{
+	Up,
+	Down,
+	Left,
+	Right
+};
+enum Direction direction = Up;
+
+enum HeadPart
+{
+	HeadTop,
+	HeadBottom,
+	HeadLeft,
+	HeadRight
+};
+enum HeadPart headPart = HeadTop;
+
+enum BodyPart
+{
+	BottomLeft,
+	BottomRight,
+	BottomTop,
+	LeftRight,
+	LeftTop,
+	RightTop
+};
+enum BodyPart snakeBodyParts[15 * 8];
+
+enum TailPart
+{
+	TailBottom,
+	TailTop,
+	TailLeft,
+	TailRight
+};
+enum TailPart tailPart = TailTop;
+
+uint8_t snakeSize = 0;
+uint32_t appleEaten = 0;
+uint32_t gameStarted = 0;
+uint32_t gamePaused = 0;
+uint32_t gameOver = 0;
+uint32_t lastMove = 1; // dernier déplacement du snake avant la mort
+
+uint8_t snakeHeadPosition[2] = {7, 6};
+uint8_t snakeBodyPosition[15 * 8][2] = {};
+uint8_t snakeTailPosition[2] = {7, 7};
+uint8_t oldTailPosition[2];
+int8_t applePosition[4][2];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,13 +217,11 @@ static void MX_DMA2D_Init(void);
 static void MX_SAI2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_ADC3_Init(void);
-void Play_Wave(void const *argument);
-void Affichage_Pic(void const *argument);
-void deplac_pok(void const *argument);
-void Demarrage(void const *argument);
-void deplacement(void const *argument);
-void chgZone(void const *argument);
-void combat(void const *argument);
+void StartDefaultTask(void const *argument);
+void StartDisplayTask(void const *argument);
+void StartManageBodyParts(void const *argument);
+void StartTsHandler(void const *argument);
+void StartPlaySongTask(void const *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -155,6 +229,200 @@ void combat(void const *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_t backY, uint8_t missingX, uint8_t missingY)
+{
+	/*
+	  . F .
+	  . X .
+	  . B .
+	*/
+	if (frontX == backX)
+		return BottomTop;
+
+	/*
+	  . . .
+	  F X B
+	  . . .
+	*/
+	if (frontY == backY)
+		return LeftRight;
+
+	/*
+	  . B .       . . .
+	  F X .       . X B
+	  . . .       . F .
+	*/
+	if (frontX < backX && frontY > backY)
+	{
+		if (missingX == frontX)
+			return BottomRight;
+		else
+			return LeftTop;
+	}
+
+	/*
+	  . . .       . F .
+	  F X .       . X B
+	  . B .       . . .
+	*/
+	if (frontX < backX && frontY < backY)
+	{
+		if (missingX == frontX)
+			return RightTop;
+		else
+			return BottomLeft;
+	}
+
+	/*
+	  . . .       . F .
+	  . X F       B X .
+	  . B .       . . .
+	*/
+	if (frontX > backX && frontY < backY)
+	{
+		if (missingX == frontX)
+			return LeftTop;
+		else
+			return BottomRight;
+	}
+
+	/*
+	  . B .       . . .
+	  . X F       B X .
+	  . . .       . F .
+	*/
+	if (frontX > backX && frontY > backY)
+	{
+		if (missingX == frontX)
+			return BottomLeft;
+		else
+			return RightTop;
+	}
+
+	return BottomTop; // should never happen
+}
+
+uint8_t isSnakePosition(uint8_t x, uint8_t y)
+{
+	if (x == snakeHeadPosition[0] && y == snakeHeadPosition[1])
+		return 1;
+
+	for (int i = 0; i < snakeSize; i++)
+	{
+		if (x == snakeBodyPosition[i][0] && y == snakeBodyPosition[i][1])
+			return 1;
+	}
+
+	if (x == snakeTailPosition[0] && y == snakeTailPosition[1])
+		return 1;
+
+	return 0;
+}
+
+uint8_t isApplePosition(uint8_t x, uint8_t y, uint8_t appleIndex)
+{
+	for (int i = 0; i < NBApple; i++)
+	{
+		if (i == appleIndex)
+			continue;
+
+		if (x == applePosition[i][0] && y == applePosition[i][1])
+			return 1;
+	}
+
+	return 0;
+}
+
+void updateJoystickDirection()
+{
+	// config de la récupération des valeurs du joystick
+	ADC_ChannelConfTypeDef sConfig = {0};
+	sConfig.Rank = ADC_REGULAR_RANK_1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+	// recuperation valeur joystick
+	sConfig.Channel = ADC_CHANNEL_8;
+	HAL_ADC_ConfigChannel(&hadc3, &sConfig);
+	HAL_ADC_Start(&hadc3);
+	while (HAL_ADC_PollForConversion(&hadc3, 100) != HAL_OK)
+		;
+	joystick_v = HAL_ADC_GetValue(&hadc3);
+
+	HAL_ADC_Start(&hadc1);
+	while (HAL_ADC_PollForConversion(&hadc1, 100) != HAL_OK)
+		;
+	joystick_h = HAL_ADC_GetValue(&hadc1);
+
+	if (joystick_v < 1000 && headPart != HeadTop)
+	{
+		direction = Down;
+	}
+	else if (joystick_v > 3000 && headPart != HeadBottom)
+	{
+		direction = Up;
+	}
+	else if (joystick_h < 1000 && headPart != HeadLeft)
+	{
+		direction = Right;
+	}
+	else if (joystick_h > 3000 && headPart != HeadRight)
+	{
+		direction = Left;
+	}
+}
+
+void restartGame()
+{
+	gameOver = 0;
+	lastMove = 1;
+	snakeSize = 0;
+	speed = initSpeed;
+	snakeHeadPosition[0] = 7;
+	snakeHeadPosition[1] = 6;
+	snakeTailPosition[0] = 7;
+	snakeTailPosition[1] = 7;
+	direction = Up;
+	headPart = HeadTop;
+	tailPart = TailTop;
+
+	for (int i = 0; i < NBApple; i++)
+	{
+		do
+		{
+			applePosition[i][0] = rand() % gridSizeX;
+			applePosition[i][1] = rand() % gridSizeY;
+		} while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
+	}
+
+	BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+}
+
+void displayGameStatus()
+{
+	if (gameOver)
+	{
+		BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_DisplayStringAt(0, 100, (uint8_t *)"Game Over", CENTER_MODE);
+		BSP_LCD_SetFont(&Font16);
+		BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"Touch the screen to restart", CENTER_MODE);
+	}
+	else if (gamePaused)
+	{
+		BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_DisplayStringAt(0, 100, (uint8_t *)"Game Paused", CENTER_MODE);
+		BSP_LCD_SetFont(&Font16);
+		BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"Touch the screen to resume", CENTER_MODE);
+	}
+	else if (!gameStarted)
+	{
+		BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_DisplayStringAt(0, 100, (uint8_t *)"Snake Game", CENTER_MODE);
+		BSP_LCD_SetFont(&Font16);
+		BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"Touch the screen to start", CENTER_MODE);
+	}
+}
 
 void SD_Init()
 {
@@ -188,7 +456,7 @@ void Audio_Init(uint32_t freq)
 	//	memset((uint16_t*) AUDIO_BUFFER_READ, 0, AUDIO_BLOCK_SIZE * 2);
 
 	/* Start Recording */
-	BSP_AUDIO_OUT_SetVolume(70);
+	BSP_AUDIO_OUT_SetVolume(40);
 	/* Start Playback */
 	BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
 	if (BSP_AUDIO_OUT_Play((uint16_t *)AUDIO_BUFFER_OUT,
@@ -322,22 +590,24 @@ int main(void)
 	BSP_LCD_Init();
 	BSP_LCD_LayerDefaultInit(0, LCD_FB_START_ADDRESS);
 	BSP_LCD_LayerDefaultInit(1, LCD_FB_START_ADDRESS + BSP_LCD_GetXSize() * BSP_LCD_GetYSize() * 4);
+	BSP_LCD_DisplayOn();
 	BSP_LCD_SelectLayer(0);
-	BSP_LCD_Clear(LCD_COLOR_WHITE);
+	BSP_LCD_Clear((uint32_t)0xFF81CD4B);
 	BSP_LCD_SelectLayer(1);
-	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
+	BSP_LCD_Clear(00);
 	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+	BSP_LCD_SetBackColor(00);
 
-	// Activer les deux couches
-	BSP_LCD_SetLayerVisible(0, ENABLE);
-	BSP_LCD_SetLayerVisible(1, ENABLE);
-
-	// Activer le mode multi-couches
-	BSP_LCD_SetTransparency(0, 255); // Couche inférieure opaque
-	BSP_LCD_SetTransparency(1, 0);	 // Couche supérieure transparente
 	BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+
 	Audio_Init(Audio_freq);
 	/* USER CODE END 2 */
+
+	/* Create the mutex(es) */
+	/* definition and creation of displayMutex */
+	osMutexDef(displayMutex);
+	displayMutexHandle = osMutexCreate(osMutex(displayMutex));
 
 	/* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -361,35 +631,28 @@ int main(void)
 	/* USER CODE END RTOS_QUEUES */
 
 	/* Create the thread(s) */
+	/* definition and creation of defaultTask */
+	osThreadDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 128);
+	defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-	/* definition and creation of Play_wav */
-	osThreadDef(Play_wav, Play_Wave, osPriorityHigh, 0, 256);
-	Play_wavHandle = osThreadCreate(osThread(Play_wav), NULL);
+	/* definition and creation of displayTask */
+	osThreadDef(displayTask, StartDisplayTask, osPriorityLow, 0, 1024);
+	displayTaskHandle = osThreadCreate(osThread(displayTask), NULL);
+
+	/* definition and creation of manageBodyParts */
+	osThreadDef(manageBodyParts, StartManageBodyParts, osPriorityHigh, 0, 256);
+	manageBodyPartsHandle = osThreadCreate(osThread(manageBodyParts), NULL);
+
+	/* definition and creation of tsHandlerTask */
+	osThreadDef(tsHandlerTask, StartTsHandler, osPriorityHigh, 0, 256);
+	tsHandlerTaskHandle = osThreadCreate(osThread(tsHandlerTask), NULL);
+
+	/* definition and creation of playSongTask */
+	osThreadDef(playSongTask, StartPlaySongTask, osPriorityHigh, 0, 256);
+	playSongTaskHandle = osThreadCreate(osThread(playSongTask), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	/* definition and creation of task_Affich_Pic */
-	osThreadDef(task_Affich_Pic, Affichage_Pic, osPriorityNormal, 0, 1024);
-	task_Affich_PicHandle = osThreadCreate(osThread(task_Affich_Pic), NULL);
-
-	/* definition and creation of task_Demarrage */
-	osThreadDef(task_Demarrage, Demarrage, osPriorityHigh, 0, 1024);
-	task_DemarrageHandle = osThreadCreate(osThread(task_Demarrage), NULL);
-
-	/* USER CODE BEGIN RTOS_THREADS */
-	osThreadDef(task_chgZone, chgZone, osPriorityHigh, 0, 256);
-	task_chgZoneHandle = osThreadCreate(osThread(task_chgZone), NULL);
-	/* definition and creation of deplacement */
-	osThreadDef(task_deplacement, deplacement, osPriorityHigh, 0, 512);
-	task_deplacementHandle = osThreadCreate(osThread(task_deplacement), NULL);
-	/* definition and creation of deplac_pok */
-	osThreadDef(task_deplac_pok, deplac_pok, osPriorityNormal, 0, 1024);
-	task_deplac_pokHandle = osThreadCreate(osThread(task_deplac_pok), NULL);
-	/* definition and creation of task_combat */
-	osThreadDef(task_combat, combat, osPriorityHigh, 0, 1024);
-	task_combatHandle = osThreadCreate(osThread(task_combat), NULL);
-	vTaskSuspend(task_combatHandle);
-	vTaskSuspend(Play_wavHandle);
 	/* USER CODE END RTOS_THREADS */
 
 	/* Start scheduler */
@@ -400,7 +663,6 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -1270,16 +1532,537 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 }
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_Play_Wave */
+/* USER CODE BEGIN Header_StartDefaultTask */
 /**
- * @brief Function implementing the Play_wav thread.
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const *argument)
+{
+	/* USER CODE BEGIN 5 */
+	/* Infinite loop */
+	for (;;)
+	{
+		updateJoystickDirection();
+		osDelay(10);
+	}
+	/* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartDisplayTask */
+/**
+ * @brief Function implementing the displayTask thread.
  * @param argument: Not used
  * @retval None
  */
-/* USER CODE END Header_Play_Wave */
-void Play_Wave(void const *argument)
+/* USER CODE END Header_StartDisplayTask */
+void StartDisplayTask(void const *argument)
 {
-	/* USER CODE BEGIN Play_Wave */
+	/* USER CODE BEGIN StartDisplayTask */
+	vTaskSuspend(manageBodyPartsHandle);
+	vTaskSuspend(tsHandlerTaskHandle);
+	vTaskSuspend(playSongTaskHandle);
+	vTaskDelay(100);
+
+	uwInternelBuffer = (uint8_t *)0xC0260000;
+	uwInternelBuffer2 = (uint8_t *)0xC0360000;
+
+	uint8_t counter;
+
+	/*##- Initialize the Directory Files pointers (heap) ###################*/
+	for (counter = 0; counter < MAX_BMP_FILES; counter++)
+	{
+		pDirectoryFiles[counter] = malloc(MAX_BMP_FILE_NAME);
+		if (pDirectoryFiles[counter] == NULL)
+		{
+			/* Set the Text Color */
+			BSP_LCD_SetTextColor(LCD_COLOR_RED);
+
+			BSP_LCD_DisplayStringAtLine(8,
+										(uint8_t *)"  Cannot allocate memory ");
+
+			while (1)
+			{
+			}
+		}
+	}
+
+	// Lancement de la musique
+	SD_Init();
+	Charge_Wave(0);
+
+	vTaskResume(manageBodyPartsHandle);
+	vTaskResume(tsHandlerTaskHandle);
+	vTaskResume(playSongTaskHandle);
+
+	vTaskDelay(1000);
+	/* Infinite loop */
+	for (;;)
+	{
+		if ((gameOver && !lastMove) || gamePaused || !gameStarted)
+		{ // revoir la condition
+			xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
+			displayGameStatus();
+			xSemaphoreGive(displayMutexHandle);
+		}
+		else
+		{
+			// On convertit la direction en texte
+			char directionText[100];
+			switch (direction)
+			{
+			case Up:
+				sprintf(directionText, (char *)"Direction: Up   ");
+				break;
+			case Down:
+				sprintf(directionText, (char *)"Direction: Down ");
+				break;
+			case Left:
+				sprintf(directionText, (char *)"Direction: Left ");
+				break;
+			case Right:
+				sprintf(directionText, (char *)"Direction: Right");
+				break;
+			}
+			// On convertit le score en texte
+			char scoreText[100];
+			sprintf(scoreText, (char *)"Score: %d", snakeSize);
+
+			// On convertit la vitesse en texte
+			char speedText[100];
+			sprintf(speedText, (char *)"Speed: %d Hz", speed);
+
+			xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
+			BSP_LCD_SetTextColor(LCD_COLOR_BROWN);
+			BSP_LCD_DrawHLine(0, 8 * 32, BSP_LCD_GetXSize());
+			BSP_LCD_DrawHLine(0, 8 * 32 + 1, BSP_LCD_GetXSize());
+
+			// On affiche la direction, le score et la vitesse
+			BSP_LCD_DisplayStringAt(0, 8 * 32 + 2, (uint8_t *)directionText, LEFT_MODE);
+			BSP_LCD_DisplayStringAt(200, 8 * 32 + 2, (uint8_t *)scoreText, LEFT_MODE);
+			BSP_LCD_DisplayStringAt(350, 8 * 32 + 2, (uint8_t *)speedText, LEFT_MODE);
+
+			// On affiche la tête du snake
+			if (!gameOver)
+				switch (headPart)
+				{
+				case HeadBottom:
+					BSP_LCD_DrawBitmap(snakeHeadPosition[0] * 32, snakeHeadPosition[1] * 32, (uint8_t *)images_bmp_color_head_bottom_81CD4B_bmp);
+					break;
+				case HeadTop:
+					BSP_LCD_DrawBitmap(snakeHeadPosition[0] * 32, snakeHeadPosition[1] * 32, (uint8_t *)images_bmp_color_head_top_81CD4B_bmp);
+					break;
+				case HeadLeft:
+					BSP_LCD_DrawBitmap(snakeHeadPosition[0] * 32, snakeHeadPosition[1] * 32, (uint8_t *)images_bmp_color_head_left_81CD4B_bmp);
+					break;
+				case HeadRight:
+					BSP_LCD_DrawBitmap(snakeHeadPosition[0] * 32, snakeHeadPosition[1] * 32, (uint8_t *)images_bmp_color_head_right_81CD4B_bmp);
+					break;
+				}
+
+			// On affiche le corps du snake
+			for (int i = 0; i < snakeSize; i++)
+			{
+				switch (snakeBodyParts[i])
+				{
+				case BottomLeft:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_bottom_left_81CD4B_bmp);
+					break;
+				case BottomRight:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_bottom_right_81CD4B_bmp);
+					break;
+				case BottomTop:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_bottom_top_81CD4B_bmp);
+					break;
+				case LeftRight:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_left_right_81CD4B_bmp);
+					break;
+				case LeftTop:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_left_top_81CD4B_bmp);
+					break;
+				case RightTop:
+					BSP_LCD_DrawBitmap(snakeBodyPosition[i][0] * 32, snakeBodyPosition[i][1] * 32, (uint8_t *)images_bmp_color_right_top_81CD4B_bmp);
+					break;
+				}
+			}
+
+			// On affiche la queue du snake
+			switch (tailPart)
+			{
+			case TailBottom:
+				BSP_LCD_DrawBitmap(snakeTailPosition[0] * 32, snakeTailPosition[1] * 32, (uint8_t *)images_bmp_color_tail_bottom_81CD4B_bmp);
+				break;
+			case TailTop:
+				BSP_LCD_DrawBitmap(snakeTailPosition[0] * 32, snakeTailPosition[1] * 32, (uint8_t *)images_bmp_color_tail_top_81CD4B_bmp);
+				break;
+			case TailLeft:
+				BSP_LCD_DrawBitmap(snakeTailPosition[0] * 32, snakeTailPosition[1] * 32, (uint8_t *)images_bmp_color_tail_left_81CD4B_bmp);
+				break;
+			case TailRight:
+				BSP_LCD_DrawBitmap(snakeTailPosition[0] * 32, snakeTailPosition[1] * 32, (uint8_t *)images_bmp_color_tail_right_81CD4B_bmp);
+				break;
+			}
+
+			// On efface l'ancienne queue avec un carré vert
+			if (!appleEaten && (snakeHeadPosition[0] != oldTailPosition[0] || snakeHeadPosition[1] != oldTailPosition[1]))
+			{
+				// On efface l'ancienne queue si:
+				//    - le snake a avancé (la queue n'est pas restée à la même position)
+				// ou
+				//    - la tête n'est pas à la position de l'ancienne queue (le snake suit sa queue)
+				BSP_LCD_SetTextColor((uint32_t)0xFF81CD4B); // 0xFF81CD4B
+				BSP_LCD_FillRect(oldTailPosition[0] * 32, oldTailPosition[1] * 32, 32, 32);
+			}
+
+			// On affiche les pommes
+			for (int i = 0; i < NBApple; i++)
+				if (applePosition[i][0] != -1)
+					BSP_LCD_DrawBitmap(applePosition[i][0] * 32, applePosition[i][1] * 32, (uint8_t *)images_bmp_color_apple_81CD4B_bmp);
+			xSemaphoreGive(displayMutexHandle);
+
+			if (gameOver)
+				lastMove = 0;
+		}
+
+		osDelay(90);
+	}
+	/* USER CODE END StartDisplayTask */
+}
+
+/* USER CODE BEGIN Header_StartManageBodyParts */
+/**
+ * @brief Function implementing the manageBodyParts thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartManageBodyParts */
+void StartManageBodyParts(void const *argument)
+{
+	/* USER CODE BEGIN StartManageBodyParts */
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	TickType_t delay = pdMS_TO_TICKS(1000. / initSpeed);
+
+	/* Infinite loop */
+	for (;;)
+	{
+		delay = pdMS_TO_TICKS(1000. / speed);
+
+		if (!gameOver && !gamePaused && gameStarted)
+		{
+			// Le jeu est en cours
+
+			// On sauvegarde la position de la queue et de la tête
+			oldTailPosition[0] = snakeTailPosition[0];
+			oldTailPosition[1] = snakeTailPosition[1];
+
+			uint8_t oldHeadPosition[2];
+			oldHeadPosition[0] = snakeHeadPosition[0];
+			oldHeadPosition[1] = snakeHeadPosition[1];
+
+			// On met a jour la position de la tête en fonction de la direction
+			switch (direction)
+			{
+			case Up:
+				headPart = HeadTop;
+				snakeHeadPosition[1]--;
+				break;
+			case Down:
+				headPart = HeadBottom;
+				snakeHeadPosition[1]++;
+				break;
+			case Left:
+				headPart = HeadLeft;
+				snakeHeadPosition[0]--;
+				break;
+			case Right:
+				headPart = HeadRight;
+				snakeHeadPosition[0]++;
+				break;
+			}
+
+			// on vérifie si on est mort
+			if (snakeHeadPosition[0] >= gridSizeX || snakeHeadPosition[1] >= gridSizeY || snakeHeadPosition[0] < 0 || snakeHeadPosition[1] < 0)
+			{
+				// On a touché un mur
+				gameOver = 1;
+			}
+			else
+			{
+				for (int i = 0; i < snakeSize; i++)
+				{
+					if (snakeHeadPosition[0] == snakeBodyPosition[i][0] && snakeHeadPosition[1] == snakeBodyPosition[i][1])
+					{
+						// On a touché notre corps
+						gameOver = 1;
+					}
+				}
+			}
+			// Note: Inutile de vérifier si on a touché la queue. Celle ci n'a pas encore avancé.
+
+			// On vérifie si on a mangé la pomme avant de bouger le corps et la queue
+			appleEaten = 0;
+			for (int i = 0; i < NBApple; i++)
+			{
+				if (snakeHeadPosition[0] == applePosition[i][0] && snakeHeadPosition[1] == applePosition[i][1])
+				{
+					snakeSize++;
+					appleEaten = 1;
+
+					// On augmente la vitesse de 1Hz a chaque palier
+					for (int i = 0; i < 5; i++)
+					{
+						if (snakeSize == palierIncreaseSpeed[i])
+						{
+							speed++;
+							break;
+						}
+					}
+
+					// On ajoute un bodyPart à la queue
+					for (int i = snakeSize - 1; i > 0; i--)
+					{
+						snakeBodyParts[i] = snakeBodyParts[i - 1];
+						snakeBodyPosition[i][0] = snakeBodyPosition[i - 1][0];
+						snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
+					}
+
+					// On met a jour le premier bodyPart
+					uint8_t backX;
+					uint8_t backY;
+
+					if (snakeSize > 1)
+					{
+						backX = snakeBodyPosition[0][0];
+						backY = snakeBodyPosition[0][1];
+					}
+					else
+					{
+						backX = snakeTailPosition[0];
+						backY = snakeTailPosition[1];
+					}
+
+					// Trouve le type de bodyPart à mettre
+					snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], backX, backY, oldHeadPosition[0], oldHeadPosition[1]);
+					snakeBodyPosition[0][0] = oldHeadPosition[0];
+					snakeBodyPosition[0][1] = oldHeadPosition[1];
+
+					// Si on a de la place pour une nouvelle pomme
+					uint8_t NBFreeCells = gridSizeX * gridSizeY - snakeSize - 1;
+					if (NBFreeCells > NBApple)
+					{
+						// On génère une nouvelle pomme à une position aléatoire qui n'est pas sur le snake ou une autre pomme
+						do
+						{
+							applePosition[i][0] = rand() % gridSizeX;
+							applePosition[i][1] = rand() % gridSizeY;
+						} while (isSnakePosition(applePosition[i][0], applePosition[i][1]) || isApplePosition(applePosition[i][0], applePosition[i][1], i));
+					}
+					else
+					{
+						applePosition[i][0] = -1;
+						applePosition[i][1] = -1;
+					}
+				}
+			}
+
+			// On n'a pas mangé de pomme on avance le corps et la queue sans ajouter de bodyPart
+			if (!appleEaten)
+			{
+				// on met a jour la position de la queue
+				if (snakeSize > 0)
+				{
+					snakeTailPosition[0] = snakeBodyPosition[snakeSize - 1][0];
+					snakeTailPosition[1] = snakeBodyPosition[snakeSize - 1][1];
+				}
+				else
+				{
+					snakeTailPosition[0] = oldHeadPosition[0];
+					snakeTailPosition[1] = oldHeadPosition[1];
+				}
+
+				// On avance le corps
+				for (int i = snakeSize - 1; i > 0; i--)
+				{
+					snakeBodyParts[i] = snakeBodyParts[i - 1];
+					snakeBodyPosition[i][0] = snakeBodyPosition[i - 1][0];
+					snakeBodyPosition[i][1] = snakeBodyPosition[i - 1][1];
+				}
+
+				// On met a jour le corps
+				if (snakeSize > 0)
+				{
+					// On trouve le type de bodyPart à mettre juste derrière la tête
+					snakeBodyParts[0] = whatBodyPart(snakeHeadPosition[0], snakeHeadPosition[1], snakeBodyPosition[0][0], snakeBodyPosition[0][1], oldHeadPosition[0], oldHeadPosition[1]);
+					snakeBodyPosition[0][0] = oldHeadPosition[0];
+					snakeBodyPosition[0][1] = oldHeadPosition[1];
+
+					// On met a jour le l'orientation de la queue
+					switch (snakeBodyParts[snakeSize - 1])
+					{
+					case BottomLeft:
+						// TailTop ou TailRight
+						if (snakeBodyPosition[snakeSize - 1][0] == snakeTailPosition[0])
+						{
+							tailPart = TailTop;
+						}
+						else
+						{
+							tailPart = TailRight;
+						}
+						break;
+					case BottomRight:
+						// TailBottom ou TailLeft
+						if (snakeBodyPosition[snakeSize - 1][0] == snakeTailPosition[0])
+						{
+							tailPart = TailTop;
+						}
+						else
+						{
+							tailPart = TailLeft;
+						}
+						break;
+					case BottomTop:
+						// TailTop ou TailBottom
+						if (snakeBodyPosition[snakeSize - 1][1] < snakeTailPosition[1])
+						{
+							tailPart = TailTop;
+						}
+						else
+						{
+							tailPart = TailBottom;
+						}
+						break;
+					case LeftRight:
+						// TailRight ou TailLeft
+						if (snakeBodyPosition[snakeSize - 1][0] < snakeTailPosition[0])
+						{
+							tailPart = TailLeft;
+						}
+						else
+						{
+							tailPart = TailRight;
+						}
+						break;
+					case LeftTop:
+						// TailRight ou TailBottom
+						if (snakeBodyPosition[snakeSize - 1][1] == snakeTailPosition[1])
+						{
+							tailPart = TailRight;
+						}
+						else
+						{
+							tailPart = TailBottom;
+						}
+						break;
+					case RightTop:
+						// TailLeft ou TailBottom
+						if (snakeBodyPosition[snakeSize - 1][1] == snakeTailPosition[1])
+						{
+							tailPart = TailLeft;
+						}
+						else
+						{
+							tailPart = TailBottom;
+						}
+						break;
+					}
+				}
+				else
+				{
+					switch (headPart)
+					{
+					case HeadTop:
+						tailPart = TailTop;
+						break;
+					case HeadBottom:
+						tailPart = TailBottom;
+						break;
+					case HeadLeft:
+						tailPart = TailLeft;
+						break;
+					case HeadRight:
+						tailPart = TailRight;
+						break;
+					}
+				}
+			}
+		}
+
+		vTaskDelayUntil(&xLastWakeTime, delay);
+	}
+	/* USER CODE END StartManageBodyParts */
+}
+
+/* USER CODE BEGIN Header_StartTsHandler */
+/**
+ * @brief Function implementing the tsHandlerTask thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartTsHandler */
+void StartTsHandler(void const *argument)
+{
+	/* USER CODE BEGIN StartTsHandler */
+	/* Infinite loop */
+	for (;;)
+	{
+		if (!gameStarted)
+			rand();
+
+		BSP_TS_GetState(&TS_State);
+
+		if (!TS_State.touchDetected && screenPressed)
+		{
+			if (gameOver)
+			{
+				BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+				restartGame();
+			}
+			else if (gamePaused)
+			{
+				xSemaphoreTake(displayMutexHandle, portMAX_DELAY);
+				BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+				xSemaphoreGive(displayMutexHandle);
+				gamePaused = 0;
+			}
+			else if (!gameStarted)
+			{
+				BSP_LCD_Clear((uint32_t)0xFF81CD4B);
+				restartGame();
+				gameStarted = 1;
+			}
+			else
+			{
+				gamePaused = 1;
+			}
+		}
+
+		if (TS_State.touchDetected)
+		{
+			screenPressed = 1;
+		}
+		else
+		{
+			screenPressed = 0;
+		}
+
+		osDelay(10);
+	}
+	/* USER CODE END StartTsHandler */
+}
+
+/* USER CODE BEGIN Header_StartPlaySongTask */
+/**
+ * @brief Function implementing the playSongTask thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartPlaySongTask */
+void StartPlaySongTask(void const *argument)
+{
+	/* USER CODE BEGIN StartPlaySongTask */
 	char i;
 	uint32_t bytesread;
 	uint32_t taille_octet;
@@ -1318,155 +2101,7 @@ void Play_Wave(void const *argument)
 			taille_octet = 512 * Bloc_Cursor;
 		}
 	}
-	/* USER CODE END Play_Wave */
-}
-/* USER CODE BEGIN Header_Affichage_Pic */
-/**
- * @brief Function implementing the task_Affich_Pic thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_Affichage_Pic */
-void Affichage_Pic(void const *argument)
-{
-	/* USER CODE BEGIN Affichage_Pic */
-	/* Infinite loop */
-	for (;;)
-	{
-		osDelay(100);
-	}
-
-	/* USER CODE END Affichage_Pic */
-}
-
-/* USER CODE BEGIN Header_deplac_pok */
-/**
- * @brief Function implementing the task_deplac_pok thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_deplac_pok */
-void deplac_pok(void const *argument)
-{
-	/* USER CODE BEGIN deplac_pok */
-
-	for (;;)
-	{
-		osDelay(150);
-	}
-
-	/* USER CODE END deplac_pok */
-}
-
-/* USER CODE BEGIN Header_deplacement */
-/**
- * @brief Function implementing the task_deplacement thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_deplacement */
-void deplacement(void const *argument)
-{
-	/* USER CODE BEGIN deplacement */
-	/* Infinite loop */
-	for (;;)
-	{
-		osDelay(100);
-	}
-	/* USER CODE END deplacement */
-}
-
-/* USER CODE BEGIN Header_combat */
-/**
- * @brief Function implementing the task_combat thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_combat */
-void combat(void const *argument)
-{
-	/* USER CODE BEGIN combat */
-	/* Infinite loop */
-	for (;;)
-	{
-		osDelay(20);
-	}
-	/* USER CODE END combat */
-}
-
-/* USER CODE BEGIN Header_Demarrage */
-/**
- * @brief Function implementing the task_Demarrage thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_Demarrage */
-void Demarrage(void const *argument)
-{
-	/* USER CODE BEGIN Demarrage */
-	/* USER CODE BEGIN Demarrage */
-	vTaskSuspend(task_deplac_pokHandle);
-	vTaskSuspend(task_deplacementHandle);
-	vTaskSuspend(task_Affich_PicHandle);
-	vTaskDelete(task_combatHandle);
-	vTaskSuspend(task_chgZoneHandle);
-	vTaskDelay(100);
-
-	uint8_t str[30];
-
-	uwInternelBuffer = (uint8_t *)0xC0260000;
-	uwInternelBuffer2 = (uint8_t *)0xC0360000;
-
-	uint8_t counter;
-
-	/*##- Initialize the Directory Files pointers (heap) ###################*/
-	for (counter = 0; counter < MAX_BMP_FILES; counter++)
-	{
-		pDirectoryFiles[counter] = malloc(MAX_BMP_FILE_NAME);
-		if (pDirectoryFiles[counter] == NULL)
-		{
-			/* Set the Text Color */
-			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-
-			BSP_LCD_DisplayStringAtLine(8,
-										(uint8_t *)"  Cannot allocate memory ");
-
-			while (1)
-			{
-			}
-		}
-	}
-
-	// Lancement de la musique
-	SD_Init();
-	Charge_Wave(0);
-	vTaskResume(Play_wavHandle);
-
-	vTaskDelay(1000);
-
-	while (1)
-	{
-		osDelay(100);
-	}
-	/* USER CODE END Demarrage */
-}
-
-/* USER CODE BEGIN Header_chgZone */
-/**
- * @brief Function implementing the task_chgZone thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_chgZone */
-void chgZone(void const *argument)
-{
-	/* USER CODE BEGIN chgZone */
-
-	while (1)
-	{
-		osDelay(50);
-	}
-	/* USER CODE END chgZone */
+	/* USER CODE END StartPlaySongTask */
 }
 
 /**

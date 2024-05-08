@@ -58,10 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BP2_Pin GPIO_PIN_15
-#define BP2_GPIO_Port GPIOA
-#define BP1_Pin GPIO_PIN_8
-#define BP1_GPIO_Port GPIOA
 #define LCD_B0_Pin GPIO_PIN_4
 #define LCD_B0_GPIO_Port GPIOE
 #define OTG_HS_OverCurrent_Pin GPIO_PIN_3
