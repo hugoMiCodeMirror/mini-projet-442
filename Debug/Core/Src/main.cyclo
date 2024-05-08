@@ -1,9 +1,6 @@
-../Core/Src/main.c:106:5:main	1
-../Core/Src/main.c:175:6:SystemClock_Config	4
-../Core/Src/main.c:231:6:PeriphCommonClock_Config	2
-../Core/Src/main.c:255:6:initDisplay	1
-../Core/Src/main.c:272:6:initSD	2
-../Core/Src/main.c:283:6:initAudio	4
-../Core/Src/main.c:301:6:readHeader	1
-../Core/Src/main.c:339:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:356:6:Error_Handler	1
+../Core/Src/main.c:77:5:main	1
+../Core/Src/main.c:145:6:SystemClock_Config	4
+../Core/Src/main.c:201:6:PeriphCommonClock_Config	2
+../Core/Src/main.c:225:6:initDisplay	1
+../Core/Src/main.c:251:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:268:6:Error_Handler	1

@@ -60,7 +60,15 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/stm32746g_discovery_sdram.h \
  ../Core/Inc/stm32746g_discovery.h ../Core/Inc/../../Fonts/fonts.h \
  ../Core/Inc/stm32746g_discovery_ts.h ../Core/Inc/ft5336.h \
- ../Core/Inc/ts.h ../Core/Inc/adc.h ../Core/Inc/main.h \
+ ../Core/Inc/ts.h ../Core/Inc/stm32746g_discovery_audio.h \
+ ../Core/Inc/wm8994.h ../Core/Inc/audio.h ../Core/Inc/adc.h \
+ ../Core/Inc/main.h ../FATFS/App/fatfs.h \
+ ../Middlewares/Third_Party/FatFs/src/ff.h \
+ ../Middlewares/Third_Party/FatFs/src/integer.h ../FATFS/Target/ffconf.h \
+ ../FATFS/Target/bsp_driver_sd.h ../FATFS/Target/fatfs_platform.h \
+ ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
+ ../Middlewares/Third_Party/FatFs/src/diskio.h \
+ ../Middlewares/Third_Party/FatFs/src/ff.h ../FATFS/Target/sd_diskio.h \
  ../Core/Inc/Images/images_h/apple_\#81CD4B.h \
  ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h \
  ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h \
@@ -142,8 +150,21 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/stm32746g_discovery_ts.h:
 ../Core/Inc/ft5336.h:
 ../Core/Inc/ts.h:
+../Core/Inc/stm32746g_discovery_audio.h:
+../Core/Inc/wm8994.h:
+../Core/Inc/audio.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
+../FATFS/App/fatfs.h:
+../Middlewares/Third_Party/FatFs/src/ff.h:
+../Middlewares/Third_Party/FatFs/src/integer.h:
+../FATFS/Target/ffconf.h:
+../FATFS/Target/bsp_driver_sd.h:
+../FATFS/Target/fatfs_platform.h:
+../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
+../Middlewares/Third_Party/FatFs/src/diskio.h:
+../Middlewares/Third_Party/FatFs/src/ff.h:
+../FATFS/Target/sd_diskio.h:
 ../Core/Inc/Images/images_h/apple_\#81CD4B.h:
 ../Core/Inc/Images/images_h/bottom-left_\#81CD4B.h:
 ../Core/Inc/Images/images_h/bottom-right_\#81CD4B.h:

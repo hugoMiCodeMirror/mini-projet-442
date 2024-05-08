@@ -27,9 +27,13 @@
 /* USER CODE BEGIN Includes */
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
+#include "stm32746g_discovery_audio.h"
 #include "adc.h"
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "fatfs.h"
 
 #include "Images/images_h/apple_#81CD4B.h"
 #include "Images/images_h/bottom-left_#81CD4B.h"
@@ -55,7 +59,25 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define ARBG8888_BYTE_PER_PIXEL 4
+#define SDRAM_WRITE_READ_ADDR        ((uint32_t)(LCD_FB_START_ADDRESS + (RK043FN48H_WIDTH * RK043FN48H_HEIGHT * ARBG8888_BYTE_PER_PIXEL)))
 
+#define SDRAM_WRITE_READ_ADDR_OFFSET ((uint32_t)0x0800)
+#define SRAM_WRITE_READ_ADDR_OFFSET  SDRAM_WRITE_READ_ADDR_OFFSET
+
+#define AUDIO_REC_START_ADDR         SDRAM_WRITE_READ_ADDR
+
+#define AUDIO_BLOCK_SIZE   	((uint32_t)512)
+#define AUDIO_BUFFER_IN    	AUDIO_REC_START_ADDR     /* In SDRAM */
+#define AUDIO_BUFFER_OUT   	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*2)) /* In SDRAM */
+#define AUDIO_BUFFER_READ  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*4))
+#define AUDIO_BUFFER_POST  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*6))
+
+#define Audio_freq 			48000
+#define Audio_bit_res 		DEFAULT_AUDIO_IN_BIT_RESOLUTION	//16
+#define Audio_chan 			DEFAULT_AUDIO_IN_CHANNEL_NBR	//2
+#define BytePerBloc			((uint16_t)Audio_bit_res*Audio_chan/8)
+#define BytePerSec			((uint32_t)BytePerBloc*Audio_freq)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,6 +87,11 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+uint32_t Bloc_Cursor = 0;
+uint32_t freqAudio;
+uint32_t Nb_Bloc = 0;
+uint32_t Nb_octets_seconde = 1;
+
 static TS_StateTypeDef  TS_State;
 uint32_t screenPressed = 0;
 uint32_t screenReleased = 0;
@@ -130,6 +157,8 @@ osThreadId displayTaskHandle;
 osThreadId joystickTaskHandle;
 osThreadId manageBodyPartsHandle;
 osThreadId tsHandlerTaskHandle;
+osThreadId playSongTaskHandle;
+osMessageQId WakeUpHandle;
 osMutexId displayMutexHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,6 +168,11 @@ uint8_t isSnakePosition(uint8_t x, uint8_t y);
 uint8_t isApplePosition(uint8_t x, uint8_t y, uint8_t appleIndex);
 void restartGame();
 void displayGameStatus();
+
+void initSD();
+void initAudio(uint32_t freq);
+void loadSong();
+void readHeader();
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -146,6 +180,7 @@ void StartDisplayTask(void const * argument);
 void StartJoystickTask(void const * argument);
 void StartManageBodyParts(void const * argument);
 void StartTsHandlerTask(void const * argument);
+void StartPlaySongTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -191,6 +226,11 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* definition and creation of WakeUp */
+  osMessageQDef(WakeUp, 1, uint8_t);
+  WakeUpHandle = osMessageCreate(osMessageQ(WakeUp), NULL);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -215,6 +255,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of tsHandlerTask */
   osThreadDef(tsHandlerTask, StartTsHandlerTask, osPriorityHigh, 0, 512);
   tsHandlerTaskHandle = osThreadCreate(osThread(tsHandlerTask), NULL);
+
+  /* definition and creation of playSongTask */
+  osThreadDef(playSongTask, StartPlaySongTask, osPriorityHigh, 0, 256);
+  playSongTaskHandle = osThreadCreate(osThread(playSongTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -692,6 +736,53 @@ void StartTsHandlerTask(void const * argument)
   /* USER CODE END StartTsHandlerTask */
 }
 
+/* USER CODE BEGIN Header_StartPlaySongTask */
+/**
+* @brief Function implementing the playSongTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartPlaySongTask */
+void StartPlaySongTask(void const * argument)
+{
+  /* USER CODE BEGIN StartPlaySongTask */
+	char i;
+	uint32_t bytesRead;
+	uint32_t tailleOctet;
+  /* Infinite loop */
+  for(;;)
+  {
+    xQueueReceive(WakeUpHandle, &i, portMAX_DELAY);
+    if (!i) {
+    	if (Bloc_Cursor++ == Nb_Bloc - 1) {
+    		f_close(&SDFile);
+    		f_open(&SDFile, "Mus1.WAV", FA_READ);
+    		readHeader();
+    		initAudio(freqAudio);
+    		f_lseek(&SDFile, 44);
+    		Bloc_Cursor = 0;
+    	}
+    	f_read(&SDFile, (uint8_t*)AUDIO_BUFFER_OUT, AUDIO_BLOCK_SIZE, (void*)&bytesRead);
+
+    	tailleOctet = 512 * Bloc_Cursor;
+    }
+    else {
+    	if (Bloc_Cursor++ == Nb_Bloc - 1) {
+    		f_close(&SDFile);
+    		f_open(&SDFile, "Mus1.WAV", FA_READ);
+    		readHeader();
+    		initAudio(freqAudio);
+    		f_lseek(&SDFile, 44);
+    		Bloc_Cursor = 0;
+    	}
+    	f_read(&SDFile, (uint8_t*)AUDIO_BUFFER_OUT + AUDIO_BLOCK_SIZE, AUDIO_BLOCK_SIZE, (void*)&bytesRead);
+
+    	tailleOctet = 512 * Bloc_Cursor;
+    }
+  }
+  /* USER CODE END StartPlaySongTask */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_t backY, uint8_t missingX, uint8_t missingY)
@@ -762,7 +853,6 @@ enum BodyPart whatBodyPart(uint8_t frontX, uint8_t frontY, uint8_t backX, uint8_
 
   return BottomTop; // should never happen
 }
-
 
 uint8_t isSnakePosition(uint8_t x, uint8_t y)
 {
@@ -839,6 +929,89 @@ void displayGameStatus()
     BSP_LCD_SetFont(&Font16);
     BSP_LCD_DisplayStringAt(0, 130, (uint8_t *)"Touch the screen to start", CENTER_MODE);
   }
+}
+
+void initSD()
+{
+	if (f_mount(&SDFatFS, (TCHAR const*)SDPath, 0) != FR_OK) {
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD not mounted", CENTER_MODE);
+		Error_Handler();
+	}
+	else {
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD mounted", CENTER_MODE);
+	}
+}
+
+void initAudio(uint32_t freq)
+{
+	static int init = 0;
+
+	// Block ici va savoir pourquoi
+	// verifier les paramettres
+	//temporaire
+	// freq = 44100;
+	if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq,
+			DEFAULT_AUDIO_IN_BIT_RESOLUTION, DEFAULT_AUDIO_IN_CHANNEL_NBR) != AUDIO_OK) {
+		Error_Handler();
+	}
+
+	memset((uint16_t*) AUDIO_BUFFER_OUT, 0, AUDIO_BLOCK_SIZE*2);
+
+	BSP_AUDIO_OUT_SetVolume(60);
+	BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
+	if (BSP_AUDIO_OUT_Play((uint16_t*) AUDIO_BUFFER_OUT, AUDIO_BLOCK_SIZE*2) == AUDIO_OK) {
+		if (!init)
+			init = 1;
+	}
+}
+
+void loadSong()
+{
+	f_close(&SDFile);
+	f_open(&SDFile, (const TCHAR*)"Mus1.WAV", FA_READ);
+	readHeader();
+	initAudio(freqAudio);
+	f_lseek(&SDFile, 44);
+	Bloc_Cursor = 0;
+}
+
+void readHeader()
+{
+	uint32_t data=0;
+	uint32_t nb_bl;
+	uint32_t bytesread;
+	uint32_t taille_octet;
+
+
+	//Lecture du nombre d'octets
+	f_lseek(&SDFile,04);
+	f_read(&SDFile, &data, 4, (void*) &bytesread);
+//	taille_fichier=((data|MASK_32_TO_8_0)<<24)|((data|MASK_32_TO_8_1)<<8)|((data|MASK_32_TO_8_2)>>8)|((data|MASK_32_TO_8_3)>>24);
+	taille_octet=data;
+	nb_bl=data/512;
+	Nb_Bloc=(uint32_t)nb_bl;
+	data=0;
+
+	//Lecture de la fréquence d'échantillonnage
+	f_lseek(&SDFile,24);
+	f_read(&SDFile, &data, 4 , (void*) &bytesread);
+//	freq=((data2|MASK_32_TO_8_0)<<24)|((data2|MASK_32_TO_8_1)<<8)|((data2|MASK_32_TO_8_2)>>8)|((data2|MASK_32_TO_8_3)>>24);
+	freqAudio=data;
+
+	//Nombre d'octets par secondes
+	f_lseek(&SDFile,28);
+	f_read(&SDFile, (uint8_t*)&data, 4, (void*) &bytesread);
+	Nb_octets_seconde=data;
+}
+
+void BSP_AUDIO_OUT_TransferComplete_CallBack(void) {
+	char i = 1;
+	xQueueSendFromISR(WakeUpHandle, &i, 0);
+}
+
+void BSP_AUDIO_OUT_HalfTransfer_CallBack(void) {
+	char i = 0;
+	xQueueSendFromISR(WakeUpHandle, &i, 0);
 }
 /* USER CODE END Application */
 

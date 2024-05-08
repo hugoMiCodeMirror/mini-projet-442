@@ -34,8 +34,6 @@
 /* USER CODE BEGIN Includes */
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
-#include "stm32746g_discovery_audio.h"
-#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,25 +43,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ARBG8888_BYTE_PER_PIXEL 4
-#define SDRAM_WRITE_READ_ADDR        ((uint32_t)(LCD_FB_START_ADDRESS + (RK043FN48H_WIDTH * RK043FN48H_HEIGHT * ARBG8888_BYTE_PER_PIXEL)))
-
-#define SDRAM_WRITE_READ_ADDR_OFFSET ((uint32_t)0x0800)
-#define SRAM_WRITE_READ_ADDR_OFFSET  SDRAM_WRITE_READ_ADDR_OFFSET
-
-#define AUDIO_REC_START_ADDR         SDRAM_WRITE_READ_ADDR
-
-#define AUDIO_BLOCK_SIZE   	((uint32_t)512)
-#define AUDIO_BUFFER_IN    	AUDIO_REC_START_ADDR     /* In SDRAM */
-#define AUDIO_BUFFER_OUT   	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*2)) /* In SDRAM */
-#define AUDIO_BUFFER_READ  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*4))
-#define AUDIO_BUFFER_POST  	(AUDIO_REC_START_ADDR + (AUDIO_BLOCK_SIZE*6))
-
-#define Audio_freq 			48000
-#define Audio_bit_res 		DEFAULT_AUDIO_IN_BIT_RESOLUTION	//16
-#define Audio_chan 			DEFAULT_AUDIO_IN_CHANNEL_NBR	//2
-#define BytePerBloc			((uint16_t)Audio_bit_res*Audio_chan/8)
-#define BytePerSec			((uint32_t)BytePerBloc*Audio_freq)
 
 /* USER CODE END PD */
 
@@ -76,10 +55,6 @@
 
 /* USER CODE BEGIN PV */
 ADC_ChannelConfTypeDef sConfig = {0};
-uint32_t freqAudio;
-
-uint32_t Nb_Bloc = 0;
-uint32_t Nb_octets_seconde = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,10 +63,6 @@ void PeriphCommonClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 void initDisplay();
-void initSD();
-void initAudio(uint32_t freq);
-
-void readHeader();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -145,8 +116,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   initDisplay();
   initSD();
-  readHeader();
-  initAudio(freqAudio);
+  loadSong();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -267,66 +237,6 @@ void initDisplay()
   BSP_LCD_SetBackColor(00);
 
   BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-}
-
-void initSD()
-{
-	if (f_mount(&SDFatFS, (TCHAR const*)SDPath, 0) != FR_OK) {
-		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD not mounted", CENTER_MODE);
-		Error_Handler();
-	}
-	else {
-		BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"SD mounted", CENTER_MODE);
-	}
-}
-
-void initAudio(uint32_t freq)
-{
-	static int init = 0;
-
-	// Block ici va savoir pourquoi
-	// verifier les paramettres
-	if (BSP_AUDIO_IN_OUT_Init(INPUT_DEVICE_INPUT_LINE_1, OUTPUT_DEVICE_HEADPHONE, freq, 16, 2) != AUDIO_OK) {
-		Error_Handler();
-	}
-
-	memset((uint16_t*) AUDIO_BUFFER_OUT, 0, AUDIO_BLOCK_SIZE*2);
-
-	BSP_AUDIO_OUT_SetVolume(60);
-	BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
-	if (BSP_AUDIO_OUT_Play((uint16_t*) AUDIO_BUFFER_OUT, AUDIO_BLOCK_SIZE*2) == AUDIO_OK) {
-		if (!init)
-			init = 1;
-	}
-}
-
-void readHeader()
-{
-	uint32_t data=0;
-	uint32_t nb_bl;
-	uint32_t bytesread;
-	uint32_t taille_octet;
-
-
-	//Lecture du nombre d'octets
-	f_lseek(&SDFile,04);
-	f_read(&SDFile, &data, 4, (void*) &bytesread);
-//	taille_fichier=((data|MASK_32_TO_8_0)<<24)|((data|MASK_32_TO_8_1)<<8)|((data|MASK_32_TO_8_2)>>8)|((data|MASK_32_TO_8_3)>>24);
-	taille_octet=data;
-	nb_bl=data/512;
-	Nb_Bloc=(uint32_t)nb_bl;
-	data=0;
-
-	//Lecture de la fréquence d'échantillonnage
-	f_lseek(&SDFile,24);
-	f_read(&SDFile, &data, 4 , (void*) &bytesread);
-//	freq=((data2|MASK_32_TO_8_0)<<24)|((data2|MASK_32_TO_8_1)<<8)|((data2|MASK_32_TO_8_2)>>8)|((data2|MASK_32_TO_8_3)>>24);
-	freqAudio=data;
-
-	//Nombre d'octets par secondes
-	f_lseek(&SDFile,28);
-	f_read(&SDFile, (uint8_t*)&data, 4, (void*) &bytesread);
-	Nb_octets_seconde=data;
 }
 /* USER CODE END 4 */
 
