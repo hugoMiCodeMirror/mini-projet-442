@@ -115,7 +115,7 @@ uint32_t numberOfBlocks = 0;
 uint32_t blockPointer = 0;
 uint32_t audioFrequency = 44100;
 uint32_t bytesPerSecond = 1;
-uint32_t currentSong = 0;
+uint32_t currentSong = 2;
 
 char *pDirectoryFiles[MAX_BMP_FILES];
 uint8_t *uwInternelBuffer; // Buffer pour la mémoire SDRAM
@@ -474,12 +474,12 @@ void loadWav()
 		f_open(&SDFile, SONG2, FA_READ);
 	else if (currentSong == 2)
 		f_open(&SDFile, SONG3, FA_READ);
-		
+
 	extractHeaderInfo();
 	initializeAudio(audioFrequency);
 	f_lseek(&SDFile, 44);
 	blockPointer = 0;
-	currentSong = (currentSong + 1) % NB_SONGS;
+	// currentSong = (currentSong + 1) % NB_SONGS;
 }
 /* USER CODE END 0 */
 

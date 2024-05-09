@@ -11481,7 +11481,7 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
                 0x080257e8                        . = ALIGN (0x4)
                 0x080257e8                        _sidata = LOADADDR (.data)
 
-.data           0x20000000       0xfc load address 0x080257e8
+.data           0x20000000      0x100 load address 0x080257e8
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -11495,149 +11495,149 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .data.bytesPerSecond
                 0x2000002c        0x4 ./Core/Src/main.o
                 0x2000002c                bytesPerSecond
- .data.speed    0x20000030        0x1 ./Core/Src/main.o
-                0x20000030                speed
+ .data.currentSong
+                0x20000030        0x4 ./Core/Src/main.o
+                0x20000030                currentSong
+ .data.speed    0x20000034        0x1 ./Core/Src/main.o
+                0x20000034                speed
  .data.tailPart
-                0x20000031        0x1 ./Core/Src/main.o
-                0x20000031                tailPart
- *fill*         0x20000032        0x2 
+                0x20000035        0x1 ./Core/Src/main.o
+                0x20000035                tailPart
+ *fill*         0x20000036        0x2 
  .data.lastMove
-                0x20000034        0x4 ./Core/Src/main.o
-                0x20000034                lastMove
+                0x20000038        0x4 ./Core/Src/main.o
+                0x20000038                lastMove
  .data.snakeHeadPosition
-                0x20000038        0x2 ./Core/Src/main.o
-                0x20000038                snakeHeadPosition
- *fill*         0x2000003a        0x2 
- .data.snakeTailPosition
                 0x2000003c        0x2 ./Core/Src/main.o
-                0x2000003c                snakeTailPosition
+                0x2000003c                snakeHeadPosition
  *fill*         0x2000003e        0x2 
- .data.Font24   0x20000040        0x8 ./Core/Src/stm32746g_discovery_lcd.o
-                0x20000040                Font24
- .data.Font16   0x20000048        0x8 ./Core/Src/stm32746g_discovery_lcd.o
-                0x20000048                Font16
+ .data.snakeTailPosition
+                0x20000040        0x2 ./Core/Src/main.o
+                0x20000040                snakeTailPosition
+ *fill*         0x20000042        0x2 
+ .data.Font24   0x20000044        0x8 ./Core/Src/stm32746g_discovery_lcd.o
+                0x20000044                Font24
+ .data.Font16   0x2000004c        0x8 ./Core/Src/stm32746g_discovery_lcd.o
+                0x2000004c                Font16
  .data.sdramstatus.3
-                0x20000050        0x1 ./Core/Src/stm32746g_discovery_sdram.o
- *fill*         0x20000051        0x3 
+                0x20000054        0x1 ./Core/Src/stm32746g_discovery_sdram.o
+ *fill*         0x20000055        0x3 
  .data.SystemCoreClock
-                0x20000054        0x4 ./Core/Src/system_stm32f7xx.o
-                0x20000054                SystemCoreClock
+                0x20000058        0x4 ./Core/Src/system_stm32f7xx.o
+                0x20000058                SystemCoreClock
  .data.wm8994_drv
-                0x20000058       0x38 ./Core/Src/wm8994.o
-                0x20000058                wm8994_drv
+                0x2000005c       0x38 ./Core/Src/wm8994.o
+                0x2000005c                wm8994_drv
  .data.ColdStartup
-                0x20000090        0x1 ./Core/Src/wm8994.o
- *fill*         0x20000091        0x3 
+                0x20000094        0x1 ./Core/Src/wm8994.o
+ *fill*         0x20000095        0x3 
  .data.uwTickPrio
-                0x20000094        0x4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
-                0x20000094                uwTickPrio
+                0x20000098        0x4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+                0x20000098                uwTickPrio
  .data.uwTickFreq
-                0x20000098        0x1 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
-                0x20000098                uwTickFreq
- .data.Stat     0x20000099        0x1 ./FATFS/Target/sd_diskio.o
- *fill*         0x2000009a        0x2 
+                0x2000009c        0x1 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+                0x2000009c                uwTickFreq
+ .data.Stat     0x2000009d        0x1 ./FATFS/Target/sd_diskio.o
+ *fill*         0x2000009e        0x2 
  .data.uxCriticalNesting
-                0x2000009c        0x4 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
- .data.__sglue  0x200000a0        0xc C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-findfp.o)
-                0x200000a0                __sglue
+                0x200000a0        0x4 ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.o
+ .data.__sglue  0x200000a4        0xc C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-findfp.o)
+                0x200000a4                __sglue
  .data._impure_ptr
-                0x200000ac        0x4 C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-impure.o)
-                0x200000ac                _impure_ptr
+                0x200000b0        0x4 C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-impure.o)
+                0x200000b0                _impure_ptr
  .data._impure_data
-                0x200000b0       0x4c C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-impure.o)
-                0x200000b0                _impure_data
+                0x200000b4       0x4c C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(libc_a-impure.o)
+                0x200000b4                _impure_data
  *(.RamFunc)
  *(.RamFunc*)
-                0x200000fc                        . = ALIGN (0x4)
-                0x200000fc                        _edata = .
+                0x20000100                        . = ALIGN (0x4)
+                0x20000100                        _edata = .
 
-.igot.plt       0x200000fc        0x0 load address 0x080258e4
- .igot.plt      0x200000fc        0x0 C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x200000fc                        . = ALIGN (0x4)
+.igot.plt       0x20000100        0x0 load address 0x080258e8
+ .igot.plt      0x20000100        0x0 C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x20000100                        . = ALIGN (0x4)
 
-.bss            0x200000fc     0x970c load address 0x080258e4
-                0x200000fc                        _sbss = .
-                0x200000fc                        __bss_start__ = _sbss
+.bss            0x20000100     0x9708 load address 0x080258e8
+                0x20000100                        _sbss = .
+                0x20000100                        __bss_start__ = _sbss
  *(.bss)
- .bss           0x200000fc       0x1c C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/thumb/v7e-m+fp/hard/crtbegin.o
+ .bss           0x20000100       0x1c C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/thumb/v7e-m+fp/hard/crtbegin.o
  *(.bss*)
- .bss.FatFs     0x20000118        0x4 ./Core/Src/ff.o
- .bss.Fsid      0x2000011c        0x2 ./Core/Src/ff.o
- *fill*         0x2000011e        0x2 
- .bss.Files     0x20000120       0x20 ./Core/Src/ff.o
+ .bss.FatFs     0x2000011c        0x4 ./Core/Src/ff.o
+ .bss.Fsid      0x20000120        0x2 ./Core/Src/ff.o
+ *fill*         0x20000122        0x2 
+ .bss.Files     0x20000124       0x20 ./Core/Src/ff.o
  .bss.xIdleTaskTCBBuffer
-                0x20000140       0xa0 ./Core/Src/freertos.o
+                0x20000144       0xa0 ./Core/Src/freertos.o
  .bss.xIdleStack
-                0x200001e0      0x200 ./Core/Src/freertos.o
+                0x200001e4      0x200 ./Core/Src/freertos.o
  .bss.ft5336_handle
-                0x200003e0        0x3 ./Core/Src/ft5336.o
- *fill*         0x200003e3        0x1 
- .bss.coord.0   0x200003e4        0x2 ./Core/Src/ft5336.o
- *fill*         0x200003e6        0x2 
- .bss.hadc1     0x200003e8       0x48 ./Core/Src/main.o
-                0x200003e8                hadc1
- .bss.hadc3     0x20000430       0x48 ./Core/Src/main.o
-                0x20000430                hadc3
- .bss.hdma2d    0x20000478       0x40 ./Core/Src/main.o
-                0x20000478                hdma2d
- .bss.hltdc     0x200004b8       0xa8 ./Core/Src/main.o
-                0x200004b8                hltdc
+                0x200003e4        0x3 ./Core/Src/ft5336.o
+ *fill*         0x200003e7        0x1 
+ .bss.coord.0   0x200003e8        0x2 ./Core/Src/ft5336.o
+ *fill*         0x200003ea        0x2 
+ .bss.hadc1     0x200003ec       0x48 ./Core/Src/main.o
+                0x200003ec                hadc1
+ .bss.hadc3     0x20000434       0x48 ./Core/Src/main.o
+                0x20000434                hadc3
+ .bss.hdma2d    0x2000047c       0x40 ./Core/Src/main.o
+                0x2000047c                hdma2d
+ .bss.hltdc     0x200004bc       0xa8 ./Core/Src/main.o
+                0x200004bc                hltdc
  .bss.hsai_BlockA2
-                0x20000560       0x84 ./Core/Src/main.o
-                0x20000560                hsai_BlockA2
+                0x20000564       0x84 ./Core/Src/main.o
+                0x20000564                hsai_BlockA2
  .bss.hsai_BlockB2
-                0x200005e4       0x84 ./Core/Src/main.o
-                0x200005e4                hsai_BlockB2
+                0x200005e8       0x84 ./Core/Src/main.o
+                0x200005e8                hsai_BlockB2
  .bss.hdma_sai2_a
-                0x20000668       0x60 ./Core/Src/main.o
-                0x20000668                hdma_sai2_a
+                0x2000066c       0x60 ./Core/Src/main.o
+                0x2000066c                hdma_sai2_a
  .bss.hdma_sai2_b
-                0x200006c8       0x60 ./Core/Src/main.o
-                0x200006c8                hdma_sai2_b
- .bss.hsd1      0x20000728       0x84 ./Core/Src/main.o
-                0x20000728                hsd1
+                0x200006cc       0x60 ./Core/Src/main.o
+                0x200006cc                hdma_sai2_b
+ .bss.hsd1      0x2000072c       0x84 ./Core/Src/main.o
+                0x2000072c                hsd1
  .bss.hdma_sdmmc1_rx
-                0x200007ac       0x60 ./Core/Src/main.o
-                0x200007ac                hdma_sdmmc1_rx
+                0x200007b0       0x60 ./Core/Src/main.o
+                0x200007b0                hdma_sdmmc1_rx
  .bss.hdma_sdmmc1_tx
-                0x2000080c       0x60 ./Core/Src/main.o
-                0x2000080c                hdma_sdmmc1_tx
- .bss.huart1    0x2000086c       0x88 ./Core/Src/main.o
-                0x2000086c                huart1
- .bss.hsdram1   0x200008f4       0x34 ./Core/Src/main.o
-                0x200008f4                hsdram1
- .bss.hsdram2   0x20000928       0x34 ./Core/Src/main.o
-                0x20000928                hsdram2
+                0x20000810       0x60 ./Core/Src/main.o
+                0x20000810                hdma_sdmmc1_tx
+ .bss.huart1    0x20000870       0x88 ./Core/Src/main.o
+                0x20000870                huart1
+ .bss.hsdram1   0x200008f8       0x34 ./Core/Src/main.o
+                0x200008f8                hsdram1
+ .bss.hsdram2   0x2000092c       0x34 ./Core/Src/main.o
+                0x2000092c                hsdram2
  .bss.defaultTaskHandle
-                0x2000095c        0x4 ./Core/Src/main.o
-                0x2000095c                defaultTaskHandle
- .bss.displayTaskHandle
                 0x20000960        0x4 ./Core/Src/main.o
-                0x20000960                displayTaskHandle
- .bss.manageBodyPartsHandle
+                0x20000960                defaultTaskHandle
+ .bss.displayTaskHandle
                 0x20000964        0x4 ./Core/Src/main.o
-                0x20000964                manageBodyPartsHandle
- .bss.tsHandlerTaskHandle
+                0x20000964                displayTaskHandle
+ .bss.manageBodyPartsHandle
                 0x20000968        0x4 ./Core/Src/main.o
-                0x20000968                tsHandlerTaskHandle
- .bss.playSongTaskHandle
+                0x20000968                manageBodyPartsHandle
+ .bss.tsHandlerTaskHandle
                 0x2000096c        0x4 ./Core/Src/main.o
-                0x2000096c                playSongTaskHandle
- .bss.WakeUpHandle
+                0x2000096c                tsHandlerTaskHandle
+ .bss.playSongTaskHandle
                 0x20000970        0x4 ./Core/Src/main.o
-                0x20000970                WakeUpHandle
- .bss.displayMutexHandle
+                0x20000970                playSongTaskHandle
+ .bss.WakeUpHandle
                 0x20000974        0x4 ./Core/Src/main.o
-                0x20000974                displayMutexHandle
- .bss.numberOfBlocks
+                0x20000974                WakeUpHandle
+ .bss.displayMutexHandle
                 0x20000978        0x4 ./Core/Src/main.o
-                0x20000978                numberOfBlocks
- .bss.blockPointer
+                0x20000978                displayMutexHandle
+ .bss.numberOfBlocks
                 0x2000097c        0x4 ./Core/Src/main.o
-                0x2000097c                blockPointer
- .bss.currentSong
+                0x2000097c                numberOfBlocks
+ .bss.blockPointer
                 0x20000980        0x4 ./Core/Src/main.o
-                0x20000980                currentSong
+                0x20000980                blockPointer
  .bss.pDirectoryFiles
                 0x20000984       0x64 ./Core/Src/main.o
                 0x20000984                pDirectoryFiles
@@ -11848,7 +11848,7 @@ LOAD C:/ST/STM32CubeIDE_1.14.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
                 0x20009808                        __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x20009808      0xc00 load address 0x080258e4
+                0x20009808      0xc00 load address 0x080258e8
                 0x20009808                        . = ALIGN (0x8)
                 [!provide]                        PROVIDE (end = .)
                 0x20009808                        PROVIDE (_end = .)

@@ -9,27 +9,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   2 .rodata       0000e6c8  08017110  08017110  00018110  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  080257d8  080257d8  000270fc  2**0
+  3 .ARM.extab    00000000  080257d8  080257d8  00027100  2**0
                   CONTENTS
   4 .ARM          00000008  080257d8  080257d8  000267d8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  080257e0  080257e0  000270fc  2**0
+  5 .preinit_array 00000000  080257e0  080257e0  00027100  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   6 .init_array   00000004  080257e0  080257e0  000267e0  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   7 .fini_array   00000004  080257e4  080257e4  000267e4  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         000000fc  20000000  080257e8  00027000  2**2
+  8 .data         00000100  20000000  080257e8  00027000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          0000970c  200000fc  080258e4  000270fc  2**2
+  9 .bss          00009708  20000100  080258e8  00027100  2**2
                   ALLOC
- 10 ._user_heap_stack 00000c00  20009808  080258e4  00027808  2**0
+ 10 ._user_heap_stack 00000c00  20009808  080258e8  00027808  2**0
                   ALLOC
- 11 .ARM.attributes 00000030  00000000  00000000  000270fc  2**0
+ 11 .ARM.attributes 00000030  00000000  00000000  00027100  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00034b04  00000000  00000000  0002712c  2**0
+ 12 .debug_info   00034b04  00000000  00000000  00027130  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000070f3  00000000  00000000  0005bc30  2**0
+ 13 .debug_abbrev 000070f3  00000000  00000000  0005bc34  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_aranges 00002c68  00000000  00000000  00062d28  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -62,7 +62,7 @@ Disassembly of section .text:
  80001e2:	2301      	movs	r3, #1
  80001e4:	7023      	strb	r3, [r4, #0]
  80001e6:	bd10      	pop	{r4, pc}
- 80001e8:	200000fc 	.word	0x200000fc
+ 80001e8:	20000100 	.word	0x20000100
  80001ec:	00000000 	.word	0x00000000
  80001f0:	080170f8 	.word	0x080170f8
 
@@ -75,7 +75,7 @@ Disassembly of section .text:
  80001fe:	f3af 8000 	nop.w
  8000202:	bd08      	pop	{r3, pc}
  8000204:	00000000 	.word	0x00000000
- 8000208:	20000100 	.word	0x20000100
+ 8000208:	20000104 	.word	0x20000104
  800020c:	080170f8 	.word	0x080170f8
 
 08000210 <memchr>:
@@ -1593,7 +1593,7 @@ FRESULT chk_lock (	/* Check if the file can be accessed */
  800108c:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001090:	4770      	bx	lr
  8001092:	bf00      	nop
- 8001094:	20000120 	.word	0x20000120
+ 8001094:	20000124 	.word	0x20000124
 
 08001098 <enq_lock>:
 
@@ -1637,7 +1637,7 @@ int enq_lock (void)	/* Check if an entry is available for a new object */
  80010d0:	f85d 7b04 	ldr.w	r7, [sp], #4
  80010d4:	4770      	bx	lr
  80010d6:	bf00      	nop
- 80010d8:	20000120 	.word	0x20000120
+ 80010d8:	20000124 	.word	0x20000124
 
 080010dc <inc_lock>:
 static
@@ -1812,7 +1812,7 @@ UINT inc_lock (	/* Increment object open counter and returns its index (0:Intern
  80011ec:	46bd      	mov	sp, r7
  80011ee:	f85d 7b04 	ldr.w	r7, [sp], #4
  80011f2:	4770      	bx	lr
- 80011f4:	20000120 	.word	0x20000120
+ 80011f4:	20000124 	.word	0x20000124
 
 080011f8 <dec_lock>:
 
@@ -1893,7 +1893,7 @@ FRESULT dec_lock (	/* Decrement object open counter */
  8001264:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001268:	4770      	bx	lr
  800126a:	bf00      	nop
- 800126c:	20000120 	.word	0x20000120
+ 800126c:	20000124 	.word	0x20000124
 
 08001270 <clear_lock>:
 
@@ -1942,7 +1942,7 @@ void clear_lock (	/* Clear lock entries of the volume */
  80012ac:	46bd      	mov	sp, r7
  80012ae:	f85d 7b04 	ldr.w	r7, [sp], #4
  80012b2:	4770      	bx	lr
- 80012b4:	20000120 	.word	0x20000120
+ 80012b4:	20000124 	.word	0x20000124
 
 080012b8 <sync_window>:
 #if !_FS_READONLY
@@ -4925,7 +4925,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
  80024ca:	230d      	movs	r3, #13
  80024cc:	e0eb      	b.n	80026a6 <find_volume+0x492>
  80024ce:	bf00      	nop
- 80024d0:	20000118 	.word	0x20000118
+ 80024d0:	2000011c 	.word	0x2000011c
 		nclst = (tsect - sysect) / fs->csize;			/* Number of clusters */
  80024d4:	6cba      	ldr	r2, [r7, #72]	@ 0x48
  80024d6:	6abb      	ldr	r3, [r7, #40]	@ 0x28
@@ -5198,7 +5198,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
  80026ae:	bf00      	nop
  80026b0:	41615252 	.word	0x41615252
  80026b4:	61417272 	.word	0x61417272
- 80026b8:	2000011c 	.word	0x2000011c
+ 80026b8:	20000120 	.word	0x20000120
 
 080026bc <validate>:
 static
@@ -5425,7 +5425,7 @@ FRESULT f_mount (
  800280a:	46bd      	mov	sp, r7
  800280c:	bd80      	pop	{r7, pc}
  800280e:	bf00      	nop
- 8002810:	20000118 	.word	0x20000118
+ 8002810:	2000011c 	.word	0x2000011c
 
 08002814 <f_open>:
 FRESULT f_open (
@@ -7388,8 +7388,8 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
  80034e0:	f85d 7b04 	ldr.w	r7, [sp], #4
  80034e4:	4770      	bx	lr
  80034e6:	bf00      	nop
- 80034e8:	20000140 	.word	0x20000140
- 80034ec:	200001e0 	.word	0x200001e0
+ 80034e8:	20000144 	.word	0x20000144
+ 80034ec:	200001e4 	.word	0x200001e4
 
 080034f0 <ft5336_Init>:
   *         from MCU to FT5336 : ie I2C channel initialization (if required).
@@ -7611,7 +7611,7 @@ uint8_t ft5336_TS_DetectTouch(uint16_t DeviceAddr)
  80035ea:	3710      	adds	r7, #16
  80035ec:	46bd      	mov	sp, r7
  80035ee:	bd80      	pop	{r7, pc}
- 80035f0:	200003e0 	.word	0x200003e0
+ 80035f0:	200003e4 	.word	0x200003e4
 
 080035f4 <ft5336_TS_GetXY>:
   * @param  X: Pointer to X position value
@@ -7950,8 +7950,8 @@ void ft5336_TS_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
  80037c6:	46bd      	mov	sp, r7
  80037c8:	bd80      	pop	{r7, pc}
  80037ca:	bf00      	nop
- 80037cc:	200003e0 	.word	0x200003e0
- 80037d0:	200003e4 	.word	0x200003e4
+ 80037cc:	200003e4 	.word	0x200003e4
+ 80037d0:	200003e8 	.word	0x200003e8
 
 080037d4 <ft5336_TS_EnableIT>:
   *         connected to MCU as EXTI.
@@ -8349,7 +8349,7 @@ void ft5336_TS_GetTouchInfo(uint16_t   DeviceAddr,
  80039d6:	46bd      	mov	sp, r7
  80039d8:	bd80      	pop	{r7, pc}
  80039da:	bf00      	nop
- 80039dc:	200003e0 	.word	0x200003e0
+ 80039dc:	200003e4 	.word	0x200003e4
 
 080039e0 <ft5336_Get_I2C_InitializedStatus>:
   * @brief  Return the status of I2C was initialized or not.
@@ -8369,7 +8369,7 @@ static uint8_t ft5336_Get_I2C_InitializedStatus(void)
  80039ec:	f85d 7b04 	ldr.w	r7, [sp], #4
  80039f0:	4770      	bx	lr
  80039f2:	bf00      	nop
- 80039f4:	200003e0 	.word	0x200003e0
+ 80039f4:	200003e4 	.word	0x200003e4
 
 080039f8 <ft5336_I2C_InitializeIfRequired>:
   * @brief  I2C initialize if needed.
@@ -8399,7 +8399,7 @@ static void ft5336_I2C_InitializeIfRequired(void)
 }
  8003a10:	bf00      	nop
  8003a12:	bd80      	pop	{r7, pc}
- 8003a14:	200003e0 	.word	0x200003e0
+ 8003a14:	200003e4 	.word	0x200003e4
 
 08003a18 <ft5336_TS_Configure>:
   * @brief  Basic static configuration of TouchScreen
@@ -8847,10 +8847,10 @@ uint8_t isSnakePosition(uint8_t x, uint8_t y)
  8003c4c:	46bd      	mov	sp, r7
  8003c4e:	f85d 7b04 	ldr.w	r7, [sp], #4
  8003c52:	4770      	bx	lr
- 8003c54:	20000038 	.word	0x20000038
+ 8003c54:	2000003c 	.word	0x2000003c
  8003c58:	20000ab8 	.word	0x20000ab8
  8003c5c:	20000aa4 	.word	0x20000aa4
- 8003c60:	2000003c 	.word	0x2000003c
+ 8003c60:	20000040 	.word	0x20000040
 
 08003c64 <isApplePosition>:
 
@@ -9055,9 +9055,9 @@ void updateJoystickDirection()
  8003da2:	3710      	adds	r7, #16
  8003da4:	46bd      	mov	sp, r7
  8003da6:	bd80      	pop	{r7, pc}
- 8003da8:	20000430 	.word	0x20000430
+ 8003da8:	20000434 	.word	0x20000434
  8003dac:	20000a20 	.word	0x20000a20
- 8003db0:	200003e8 	.word	0x200003e8
+ 8003db0:	200003ec 	.word	0x200003ec
  8003db4:	20000a24 	.word	0x20000a24
  8003db8:	20000a29 	.word	0x20000a29
  8003dbc:	20000a28 	.word	0x20000a28
@@ -9206,14 +9206,14 @@ void restartGame()
  8003ebc:	bd80      	pop	{r7, pc}
  8003ebe:	bf00      	nop
  8003ec0:	20000ab4 	.word	0x20000ab4
- 8003ec4:	20000034 	.word	0x20000034
+ 8003ec4:	20000038 	.word	0x20000038
  8003ec8:	20000aa4 	.word	0x20000aa4
- 8003ecc:	20000030 	.word	0x20000030
- 8003ed0:	20000038 	.word	0x20000038
- 8003ed4:	2000003c 	.word	0x2000003c
+ 8003ecc:	20000034 	.word	0x20000034
+ 8003ed0:	2000003c 	.word	0x2000003c
+ 8003ed4:	20000040 	.word	0x20000040
  8003ed8:	20000a28 	.word	0x20000a28
  8003edc:	20000a29 	.word	0x20000a29
- 8003ee0:	20000031 	.word	0x20000031
+ 8003ee0:	20000035 	.word	0x20000035
  8003ee4:	88888889 	.word	0x88888889
  8003ee8:	20000bac 	.word	0x20000bac
  8003eec:	ff81cd4b 	.word	0xff81cd4b
@@ -9319,9 +9319,9 @@ void displayGameStatus()
  8003f92:	bf00      	nop
  8003f94:	20000ab4 	.word	0x20000ab4
  8003f98:	ffa52a2a 	.word	0xffa52a2a
- 8003f9c:	20000040 	.word	0x20000040
+ 8003f9c:	20000044 	.word	0x20000044
  8003fa0:	08017154 	.word	0x08017154
- 8003fa4:	20000048 	.word	0x20000048
+ 8003fa4:	2000004c 	.word	0x2000004c
  8003fa8:	08017160 	.word	0x08017160
  8003fac:	20000ab0 	.word	0x20000ab0
  8003fb0:	0801717c 	.word	0x0801717c
@@ -9489,7 +9489,7 @@ void extractHeaderInfo()
  80040ac:	bd80      	pop	{r7, pc}
  80040ae:	bf00      	nop
  80040b0:	200012f0 	.word	0x200012f0
- 80040b4:	20000978 	.word	0x20000978
+ 80040b4:	2000097c 	.word	0x2000097c
  80040b8:	20000028 	.word	0x20000028
  80040bc:	2000002c 	.word	0x2000002c
 
@@ -9534,6 +9534,7 @@ void loadWav()
  80040fc:	4914      	ldr	r1, [pc, #80]	@ (8004150 <loadWav+0x90>)
  80040fe:	4810      	ldr	r0, [pc, #64]	@ (8004140 <loadWav+0x80>)
  8004100:	f7fe fb88 	bl	8002814 <f_open>
+
 	extractHeaderInfo();
  8004104:	f7ff ff9e 	bl	8004044 <extractHeaderInfo>
 	initializeAudio(audioFrequency);
@@ -9567,12 +9568,12 @@ void loadWav()
  800413c:	bd80      	pop	{r7, pc}
  800413e:	bf00      	nop
  8004140:	200012f0 	.word	0x200012f0
- 8004144:	20000980 	.word	0x20000980
+ 8004144:	20000030 	.word	0x20000030
  8004148:	080171cc 	.word	0x080171cc
  800414c:	080171d8 	.word	0x080171d8
  8004150:	080171e4 	.word	0x080171e4
  8004154:	20000028 	.word	0x20000028
- 8004158:	2000097c 	.word	0x2000097c
+ 8004158:	20000980 	.word	0x20000980
  800415c:	aaaaaaab 	.word	0xaaaaaaab
 
 08004160 <main>:
@@ -9833,21 +9834,21 @@ int main(void)
  8004310:	bf00      	nop
  8004312:	e7fd      	b.n	8004310 <main+0x1b0>
  8004314:	ff81cd4b 	.word	0xff81cd4b
- 8004318:	20000048 	.word	0x20000048
+ 8004318:	2000004c 	.word	0x2000004c
  800431c:	ffa52a2a 	.word	0xffa52a2a
- 8004320:	20000974 	.word	0x20000974
+ 8004320:	20000978 	.word	0x20000978
  8004324:	080171f0 	.word	0x080171f0
- 8004328:	20000970 	.word	0x20000970
+ 8004328:	20000974 	.word	0x20000974
  800432c:	0801720c 	.word	0x0801720c
- 8004330:	2000095c 	.word	0x2000095c
+ 8004330:	20000960 	.word	0x20000960
  8004334:	08017234 	.word	0x08017234
- 8004338:	20000960 	.word	0x20000960
+ 8004338:	20000964 	.word	0x20000964
  800433c:	08017260 	.word	0x08017260
- 8004340:	20000964 	.word	0x20000964
+ 8004340:	20000968 	.word	0x20000968
  8004344:	0801728c 	.word	0x0801728c
- 8004348:	20000968 	.word	0x20000968
+ 8004348:	2000096c 	.word	0x2000096c
  800434c:	080172b8 	.word	0x080172b8
- 8004350:	2000096c 	.word	0x2000096c
+ 8004350:	20000970 	.word	0x20000970
 
 08004354 <SystemClock_Config>:
 /**
@@ -10179,7 +10180,7 @@ static void MX_ADC1_Init(void)
  800452a:	3710      	adds	r7, #16
  800452c:	46bd      	mov	sp, r7
  800452e:	bd80      	pop	{r7, pc}
- 8004530:	200003e8 	.word	0x200003e8
+ 8004530:	200003ec 	.word	0x200003ec
  8004534:	40012000 	.word	0x40012000
  8004538:	0f000001 	.word	0x0f000001
 
@@ -10300,7 +10301,7 @@ static void MX_ADC3_Init(void)
  80045ce:	3710      	adds	r7, #16
  80045d0:	46bd      	mov	sp, r7
  80045d2:	bd80      	pop	{r7, pc}
- 80045d4:	20000430 	.word	0x20000430
+ 80045d4:	20000434 	.word	0x20000434
  80045d8:	40012200 	.word	0x40012200
  80045dc:	0f000001 	.word	0x0f000001
 
@@ -10378,7 +10379,7 @@ static void MX_DMA2D_Init(void)
  8004636:	bf00      	nop
  8004638:	bd80      	pop	{r7, pc}
  800463a:	bf00      	nop
- 800463c:	20000478 	.word	0x20000478
+ 800463c:	2000047c 	.word	0x2000047c
  8004640:	4002b000 	.word	0x4002b000
 
 08004644 <MX_LTDC_Init>:
@@ -10546,7 +10547,7 @@ static void MX_LTDC_Init(void)
  800473a:	3738      	adds	r7, #56	@ 0x38
  800473c:	46bd      	mov	sp, r7
  800473e:	bd80      	pop	{r7, pc}
- 8004740:	200004b8 	.word	0x200004b8
+ 8004740:	200004bc 	.word	0x200004bc
  8004744:	40016800 	.word	0x40016800
 
 08004748 <MX_SAI2_Init>:
@@ -10774,9 +10775,9 @@ static void MX_SAI2_Init(void)
  8004882:	bf00      	nop
  8004884:	bd80      	pop	{r7, pc}
  8004886:	bf00      	nop
- 8004888:	20000560 	.word	0x20000560
+ 8004888:	20000564 	.word	0x20000564
  800488c:	40015c04 	.word	0x40015c04
- 8004890:	200005e4 	.word	0x200005e4
+ 8004890:	200005e8 	.word	0x200005e8
  8004894:	40015c24 	.word	0x40015c24
 
 08004898 <MX_SDMMC1_SD_Init>:
@@ -10829,7 +10830,7 @@ static void MX_SDMMC1_SD_Init(void)
  80048c8:	46bd      	mov	sp, r7
  80048ca:	f85d 7b04 	ldr.w	r7, [sp], #4
  80048ce:	4770      	bx	lr
- 80048d0:	20000728 	.word	0x20000728
+ 80048d0:	2000072c 	.word	0x2000072c
  80048d4:	40012c00 	.word	0x40012c00
 
 080048d8 <MX_USART1_UART_Init>:
@@ -10903,7 +10904,7 @@ static void MX_USART1_UART_Init(void)
  800492a:	bf00      	nop
  800492c:	bd80      	pop	{r7, pc}
  800492e:	bf00      	nop
- 8004930:	2000086c 	.word	0x2000086c
+ 8004930:	20000870 	.word	0x20000870
  8004934:	40011000 	.word	0x40011000
 
 08004938 <MX_DMA_Init>:
@@ -11175,9 +11176,9 @@ static void MX_FMC_Init(void)
  8004aa2:	3720      	adds	r7, #32
  8004aa4:	46bd      	mov	sp, r7
  8004aa6:	bd80      	pop	{r7, pc}
- 8004aa8:	200008f4 	.word	0x200008f4
+ 8004aa8:	200008f8 	.word	0x200008f8
  8004aac:	a0000140 	.word	0xa0000140
- 8004ab0:	20000928 	.word	0x20000928
+ 8004ab0:	2000092c 	.word	0x2000092c
 
 08004ab4 <MX_GPIO_Init>:
  * @brief GPIO Initialization Function
@@ -12209,7 +12210,7 @@ void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
  8005132:	3708      	adds	r7, #8
  8005134:	46bd      	mov	sp, r7
  8005136:	bd80      	pop	{r7, pc}
- 8005138:	20000970 	.word	0x20000970
+ 8005138:	20000974 	.word	0x20000974
 
 0800513c <BSP_AUDIO_OUT_HalfTransfer_CallBack>:
 
@@ -12233,7 +12234,7 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
  8005156:	3708      	adds	r7, #8
  8005158:	46bd      	mov	sp, r7
  800515a:	bd80      	pop	{r7, pc}
- 800515c:	20000970 	.word	0x20000970
+ 800515c:	20000974 	.word	0x20000974
 
 08005160 <StartDefaultTask>:
  * @param  argument: Not used
@@ -12667,9 +12668,9 @@ void StartDisplayTask(void const *argument)
  8005466:	f001 fe6f 	bl	8007148 <BSP_LCD_DrawBitmap>
 					break;
  800546a:	e091      	b.n	8005590 <StartDisplayTask+0x418>
- 800546c:	20000964 	.word	0x20000964
- 8005470:	20000968 	.word	0x20000968
- 8005474:	2000096c 	.word	0x2000096c
+ 800546c:	20000968 	.word	0x20000968
+ 8005470:	2000096c 	.word	0x2000096c
+ 8005474:	20000970 	.word	0x20000970
  8005478:	200009e8 	.word	0x200009e8
  800547c:	c0260000 	.word	0xc0260000
  8005480:	200009ec 	.word	0x200009ec
@@ -12678,10 +12679,10 @@ void StartDisplayTask(void const *argument)
  800548c:	ffff0000 	.word	0xffff0000
  8005490:	080172d4 	.word	0x080172d4
  8005494:	20000ab4 	.word	0x20000ab4
- 8005498:	20000034 	.word	0x20000034
+ 8005498:	20000038 	.word	0x20000038
  800549c:	20000ab0 	.word	0x20000ab0
  80054a0:	20000aac 	.word	0x20000aac
- 80054a4:	20000974 	.word	0x20000974
+ 80054a4:	20000978 	.word	0x20000978
  80054a8:	20000a28 	.word	0x20000a28
  80054ac:	080172f0 	.word	0x080172f0
  80054b0:	08017304 	.word	0x08017304
@@ -12689,11 +12690,11 @@ void StartDisplayTask(void const *argument)
  80054b8:	0801732c 	.word	0x0801732c
  80054bc:	20000aa4 	.word	0x20000aa4
  80054c0:	08017340 	.word	0x08017340
- 80054c4:	20000030 	.word	0x20000030
+ 80054c4:	20000034 	.word	0x20000034
  80054c8:	0801734c 	.word	0x0801734c
  80054cc:	ffa52a2a 	.word	0xffa52a2a
  80054d0:	20000a29 	.word	0x20000a29
- 80054d4:	20000038 	.word	0x20000038
+ 80054d4:	2000003c 	.word	0x2000003c
  80054d8:	0801a624 	.word	0x0801a624
  80054dc:	0801b2b0 	.word	0x0801b2b0
  80054e0:	0801bf3c 	.word	0x0801bf3c
@@ -12962,21 +12963,21 @@ void StartDisplayTask(void const *argument)
  80056e8:	0801e4e0 	.word	0x0801e4e0
  80056ec:	0801f16c 	.word	0x0801f16c
  80056f0:	20000aa4 	.word	0x20000aa4
- 80056f4:	20000031 	.word	0x20000031
- 80056f8:	2000003c 	.word	0x2000003c
+ 80056f4:	20000035 	.word	0x20000035
+ 80056f8:	20000040 	.word	0x20000040
  80056fc:	0801fdf8 	.word	0x0801fdf8
  8005700:	08020a84 	.word	0x08020a84
  8005704:	08021710 	.word	0x08021710
  8005708:	0802239c 	.word	0x0802239c
  800570c:	20000aa8 	.word	0x20000aa8
- 8005710:	20000038 	.word	0x20000038
+ 8005710:	2000003c 	.word	0x2000003c
  8005714:	20000ba8 	.word	0x20000ba8
  8005718:	ff81cd4b 	.word	0xff81cd4b
  800571c:	20000bac 	.word	0x20000bac
  8005720:	080173f4 	.word	0x080173f4
- 8005724:	20000974 	.word	0x20000974
+ 8005724:	20000978 	.word	0x20000978
  8005728:	20000ab4 	.word	0x20000ab4
- 800572c:	20000034 	.word	0x20000034
+ 800572c:	20000038 	.word	0x20000038
 
 08005730 <StartManageBodyParts>:
  * @param argument: Not used
@@ -13360,13 +13361,13 @@ void StartManageBodyParts(void const *argument)
  8005992:	bf00      	nop
  8005994:	408f4000 	.word	0x408f4000
  8005998:	10624dd3 	.word	0x10624dd3
- 800599c:	20000030 	.word	0x20000030
+ 800599c:	20000034 	.word	0x20000034
  80059a0:	20000ab4 	.word	0x20000ab4
  80059a4:	20000ab0 	.word	0x20000ab0
  80059a8:	20000aac 	.word	0x20000aac
- 80059ac:	2000003c 	.word	0x2000003c
+ 80059ac:	20000040 	.word	0x20000040
  80059b0:	20000ba8 	.word	0x20000ba8
- 80059b4:	20000038 	.word	0x20000038
+ 80059b4:	2000003c 	.word	0x2000003c
  80059b8:	20000a28 	.word	0x20000a28
  80059bc:	20000a29 	.word	0x20000a29
  80059c0:	20000ab8 	.word	0x20000ab8
@@ -13795,15 +13796,15 @@ void StartManageBodyParts(void const *argument)
 						break;
  8005c70:	e058      	b.n	8005d24 <StartManageBodyParts+0x5f4>
  8005c72:	bf00      	nop
- 8005c74:	2000003c 	.word	0x2000003c
- 8005c78:	20000038 	.word	0x20000038
+ 8005c74:	20000040 	.word	0x20000040
+ 8005c78:	2000003c 	.word	0x2000003c
  8005c7c:	20000a2c 	.word	0x20000a2c
  8005c80:	20000ab8 	.word	0x20000ab8
  8005c84:	20000aa4 	.word	0x20000aa4
  8005c88:	88888889 	.word	0x88888889
  8005c8c:	20000bac 	.word	0x20000bac
  8005c90:	20000aa8 	.word	0x20000aa8
- 8005c94:	20000031 	.word	0x20000031
+ 8005c94:	20000035 	.word	0x20000035
 					case LeftTop:
 						// TailRight ou TailBottom
 						if (snakeBodyPosition[snakeSize - 1][1] == snakeTailPosition[1])
@@ -13928,8 +13929,8 @@ void StartManageBodyParts(void const *argument)
  8005d32:	bf00      	nop
  8005d34:	20000aa4 	.word	0x20000aa4
  8005d38:	20000ab8 	.word	0x20000ab8
- 8005d3c:	2000003c 	.word	0x2000003c
- 8005d40:	20000031 	.word	0x20000031
+ 8005d3c:	20000040 	.word	0x20000040
+ 8005d40:	20000035 	.word	0x20000035
  8005d44:	20000a29 	.word	0x20000a29
 
 08005d48 <StartTsHandler>:
@@ -14068,7 +14069,7 @@ void StartTsHandler(void const *argument)
  8005e04:	20000ab4 	.word	0x20000ab4
  8005e08:	ff81cd4b 	.word	0xff81cd4b
  8005e0c:	20000ab0 	.word	0x20000ab0
- 8005e10:	20000974 	.word	0x20000974
+ 8005e10:	20000978 	.word	0x20000978
 
 08005e14 <StartPlaySongTask>:
  * @brief Function implementing the playSongTask thread.
@@ -14130,9 +14131,9 @@ void StartPlaySongTask(void const *argument) {
     for (;;) {
  8005e64:	e7da      	b.n	8005e1c <StartPlaySongTask+0x8>
  8005e66:	bf00      	nop
- 8005e68:	20000970 	.word	0x20000970
- 8005e6c:	2000097c 	.word	0x2000097c
- 8005e70:	20000978 	.word	0x20000978
+ 8005e68:	20000974 	.word	0x20000974
+ 8005e6c:	20000980 	.word	0x20000980
+ 8005e70:	2000097c 	.word	0x2000097c
  8005e74:	c007fc00 	.word	0xc007fc00
  8005e78:	c007fe00 	.word	0xc007fe00
  8005e7c:	200012f0 	.word	0x200012f0
@@ -15748,7 +15749,7 @@ uint8_t BSP_AUDIO_IN_OUT_Init(uint16_t InputDevice, uint16_t OutputDevice,
  8006770:	40015c24 	.word	0x40015c24
  8006774:	20000c0c 	.word	0x20000c0c
  8006778:	40015c04 	.word	0x40015c04
- 800677c:	20000058 	.word	0x20000058
+ 800677c:	2000005c 	.word	0x2000005c
  8006780:	20000c08 	.word	0x20000c08
 
 08006784 <BSP_AUDIO_IN_Error_CallBack>:
@@ -16437,7 +16438,7 @@ uint8_t BSP_LCD_Init(void)
  8006b60:	40016800 	.word	0x40016800
  8006b64:	40022000 	.word	0x40022000
  8006b68:	40022800 	.word	0x40022800
- 8006b6c:	20000040 	.word	0x20000040
+ 8006b6c:	20000044 	.word	0x20000044
 
 08006b70 <BSP_LCD_GetXSize>:
 /**
@@ -16603,7 +16604,7 @@ void BSP_LCD_LayerDefaultInit(uint16_t LayerIndex, uint32_t FB_Address)
  8006c72:	bd80      	pop	{r7, pc}
  8006c74:	20000dd4 	.word	0x20000dd4
  8006c78:	20000ec0 	.word	0x20000ec0
- 8006c7c:	20000040 	.word	0x20000040
+ 8006c7c:	20000044 	.word	0x20000044
 
 08006c80 <BSP_LCD_SelectLayer>:
   * @brief  Selects the LCD Layer.
@@ -18590,7 +18591,7 @@ uint8_t BSP_SDRAM_Init(void)
  8007904:	20000f5c 	.word	0x20000f5c
  8007908:	a0000140 	.word	0xa0000140
  800790c:	20000f90 	.word	0x20000f90
- 8007910:	20000050 	.word	0x20000050
+ 8007910:	20000054 	.word	0x20000054
 
 08007914 <BSP_SDRAM_Initialization_sequence>:
   * @brief  Programs the SDRAM device.
@@ -20523,9 +20524,9 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
  80085a4:	40023800 	.word	0x40023800
  80085a8:	40020800 	.word	0x40020800
  80085ac:	40020c00 	.word	0x40020c00
- 80085b0:	200007ac 	.word	0x200007ac
+ 80085b0:	200007b0 	.word	0x200007b0
  80085b4:	40026458 	.word	0x40026458
- 80085b8:	2000080c 	.word	0x2000080c
+ 80085b8:	20000810 	.word	0x20000810
  80085bc:	400264a0 	.word	0x400264a0
 
 080085c0 <HAL_UART_MspInit>:
@@ -21203,11 +21204,11 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai)
  80089b4:	20001054 	.word	0x20001054
  80089b8:	40023800 	.word	0x40023800
  80089bc:	40022000 	.word	0x40022000
- 80089c0:	20000668 	.word	0x20000668
+ 80089c0:	2000066c 	.word	0x2000066c
  80089c4:	40026470 	.word	0x40026470
  80089c8:	40015c24 	.word	0x40015c24
  80089cc:	40021800 	.word	0x40021800
- 80089d0:	200006c8 	.word	0x200006c8
+ 80089d0:	200006cc 	.word	0x200006cc
  80089d4:	400264b8 	.word	0x400264b8
 
 080089d8 <HAL_SAI_MspDeInit>:
@@ -21499,7 +21500,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
  8008b70:	431bde83 	.word	0x431bde83
  8008b74:	20001058 	.word	0x20001058
  8008b78:	40001000 	.word	0x40001000
- 8008b7c:	20000094 	.word	0x20000094
+ 8008b7c:	20000098 	.word	0x20000098
 
 08008b80 <NMI_Handler>:
 /******************************************************************************/
@@ -21625,7 +21626,7 @@ void SDMMC1_IRQHandler(void)
  8008bc2:	bf00      	nop
  8008bc4:	bd80      	pop	{r7, pc}
  8008bc6:	bf00      	nop
- 8008bc8:	20000728 	.word	0x20000728
+ 8008bc8:	2000072c 	.word	0x2000072c
 
 08008bcc <TIM6_DAC_IRQHandler>:
 
@@ -21673,7 +21674,7 @@ void DMA2_Stream3_IRQHandler(void)
  8008bea:	bf00      	nop
  8008bec:	bd80      	pop	{r7, pc}
  8008bee:	bf00      	nop
- 8008bf0:	200007ac 	.word	0x200007ac
+ 8008bf0:	200007b0 	.word	0x200007b0
 
 08008bf4 <DMA2_Stream4_IRQHandler>:
 
@@ -21697,7 +21698,7 @@ void DMA2_Stream4_IRQHandler(void)
  8008bfe:	bf00      	nop
  8008c00:	bd80      	pop	{r7, pc}
  8008c02:	bf00      	nop
- 8008c04:	20000668 	.word	0x20000668
+ 8008c04:	2000066c 	.word	0x2000066c
 
 08008c08 <DMA2_Stream6_IRQHandler>:
 
@@ -21721,7 +21722,7 @@ void DMA2_Stream6_IRQHandler(void)
  8008c12:	bf00      	nop
  8008c14:	bd80      	pop	{r7, pc}
  8008c16:	bf00      	nop
- 8008c18:	2000080c 	.word	0x2000080c
+ 8008c18:	20000810 	.word	0x20000810
 
 08008c1c <DMA2_Stream7_IRQHandler>:
 
@@ -21745,7 +21746,7 @@ void DMA2_Stream7_IRQHandler(void)
  8008c26:	bf00      	nop
  8008c28:	bd80      	pop	{r7, pc}
  8008c2a:	bf00      	nop
- 8008c2c:	200006c8 	.word	0x200006c8
+ 8008c2c:	200006cc 	.word	0x200006cc
 
 08008c30 <LTDC_IRQHandler>:
 
@@ -21769,7 +21770,7 @@ void LTDC_IRQHandler(void)
  8008c3a:	bf00      	nop
  8008c3c:	bd80      	pop	{r7, pc}
  8008c3e:	bf00      	nop
- 8008c40:	200004b8 	.word	0x200004b8
+ 8008c40:	200004bc 	.word	0x200004bc
 
 08008c44 <_getpid>:
 void initialise_monitor_handles()
@@ -23497,7 +23498,7 @@ uint32_t wm8994_Init(uint16_t DeviceAddr, uint16_t OutputInputDevice, uint8_t Vo
  80097b2:	e016      	b.n	80097e2 <wm8994_Init+0x9ee>
  80097b4:	200010ac 	.word	0x200010ac
  80097b8:	00017700 	.word	0x00017700
- 80097bc:	20000090 	.word	0x20000090
+ 80097bc:	20000094 	.word	0x20000094
       }
       else /* Headphone Warm Start-Up */
       { 
@@ -25863,11 +25864,11 @@ LoopFillZerobss:
   ldr r0, =_sdata
  800a708:	20000000 	.word	0x20000000
   ldr r1, =_edata
- 800a70c:	200000fc 	.word	0x200000fc
+ 800a70c:	20000100 	.word	0x20000100
   ldr r2, =_sidata
  800a710:	080257e8 	.word	0x080257e8
   ldr r2, =_sbss
- 800a714:	200000fc 	.word	0x200000fc
+ 800a714:	20000100 	.word	0x20000100
   ldr r4, =_ebss
  800a718:	20009808 	.word	0x20009808
 
@@ -25938,7 +25939,7 @@ __weak void HAL_IncTick(void)
  800a750:	f85d 7b04 	ldr.w	r7, [sp], #4
  800a754:	4770      	bx	lr
  800a756:	bf00      	nop
- 800a758:	20000098 	.word	0x20000098
+ 800a758:	2000009c 	.word	0x2000009c
  800a75c:	200010b0 	.word	0x200010b0
 
 0800a760 <HAL_GetTick>:
@@ -26012,7 +26013,7 @@ __weak void HAL_Delay(uint32_t Delay)
  800a7b6:	46bd      	mov	sp, r7
  800a7b8:	bd80      	pop	{r7, pc}
  800a7ba:	bf00      	nop
- 800a7bc:	20000098 	.word	0x20000098
+ 800a7bc:	2000009c 	.word	0x2000009c
 
 0800a7c0 <HAL_ADC_Init>:
   * @param  hadc pointer to a ADC_HandleTypeDef structure that contains
@@ -26420,7 +26421,7 @@ HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef* hadc)
  800a9c4:	f85d 7b04 	ldr.w	r7, [sp], #4
  800a9c8:	4770      	bx	lr
  800a9ca:	bf00      	nop
- 800a9cc:	20000054 	.word	0x20000054
+ 800a9cc:	20000058 	.word	0x20000058
  800a9d0:	431bde83 	.word	0x431bde83
  800a9d4:	fffff8fe 	.word	0xfffff8fe
  800a9d8:	40012300 	.word	0x40012300
@@ -27082,7 +27083,7 @@ HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef* hadc, ADC_ChannelConf
  800adac:	10000012 	.word	0x10000012
  800adb0:	40012000 	.word	0x40012000
  800adb4:	40012300 	.word	0x40012300
- 800adb8:	20000054 	.word	0x20000054
+ 800adb8:	20000058 	.word	0x20000058
  800adbc:	431bde83 	.word	0x431bde83
 
 0800adc0 <ADC_Init>:
@@ -28729,7 +28730,7 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
  800b6d6:	4798      	blx	r3
  800b6d8:	e02c      	b.n	800b734 <HAL_DMA_IRQHandler+0x2a0>
  800b6da:	bf00      	nop
- 800b6dc:	20000054 	.word	0x20000054
+ 800b6dc:	20000058 	.word	0x20000058
  800b6e0:	1b4e81b5 	.word	0x1b4e81b5
           }
         }
@@ -35724,8 +35725,8 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  800de7c:	40023c00 	.word	0x40023c00
  800de80:	40023800 	.word	0x40023800
  800de84:	080256c4 	.word	0x080256c4
- 800de88:	20000054 	.word	0x20000054
- 800de8c:	20000094 	.word	0x20000094
+ 800de88:	20000058 	.word	0x20000058
+ 800de8c:	20000098 	.word	0x20000098
 
 0800de90 <HAL_RCC_GetSysClockFreq>:
   *
@@ -35952,7 +35953,7 @@ uint32_t HAL_RCC_GetHCLKFreq(void)
  800e028:	f85d 7b04 	ldr.w	r7, [sp], #4
  800e02c:	4770      	bx	lr
  800e02e:	bf00      	nop
- 800e030:	20000054 	.word	0x20000054
+ 800e030:	20000058 	.word	0x20000058
 
 0800e034 <HAL_RCC_GetPCLK1Freq>:
   * @note   Each time PCLK1 changes, this function must be called to update the
@@ -39106,7 +39107,7 @@ static HAL_StatusTypeDef SAI_Disable(SAI_HandleTypeDef *hsai)
  800f310:	46bd      	mov	sp, r7
  800f312:	f85d 7b04 	ldr.w	r7, [sp], #4
  800f316:	4770      	bx	lr
- 800f318:	20000054 	.word	0x20000054
+ 800f318:	20000058 	.word	0x20000058
  800f31c:	95cbec1b 	.word	0x95cbec1b
 
 0800f320 <SAI_DMATxCplt>:
@@ -46902,7 +46903,7 @@ uint32_t SDMMC_GetCmdResp1(SDMMC_TypeDef *SDMMCx, uint8_t SD_CMD, uint32_t Timeo
  8011f42:	46bd      	mov	sp, r7
  8011f44:	bd80      	pop	{r7, pc}
  8011f46:	bf00      	nop
- 8011f48:	20000054 	.word	0x20000054
+ 8011f48:	20000058 	.word	0x20000058
  8011f4c:	10624dd3 	.word	0x10624dd3
  8011f50:	fdffe008 	.word	0xfdffe008
 
@@ -47009,7 +47010,7 @@ uint32_t SDMMC_GetCmdResp2(SDMMC_TypeDef *SDMMCx)
  8011fd4:	46bd      	mov	sp, r7
  8011fd6:	f85d 7b04 	ldr.w	r7, [sp], #4
  8011fda:	4770      	bx	lr
- 8011fdc:	20000054 	.word	0x20000054
+ 8011fdc:	20000058 	.word	0x20000058
  8011fe0:	10624dd3 	.word	0x10624dd3
 
 08011fe4 <SDMMC_GetCmdResp3>:
@@ -47099,7 +47100,7 @@ uint32_t SDMMC_GetCmdResp3(SDMMC_TypeDef *SDMMCx)
  8012050:	f85d 7b04 	ldr.w	r7, [sp], #4
  8012054:	4770      	bx	lr
  8012056:	bf00      	nop
- 8012058:	20000054 	.word	0x20000054
+ 8012058:	20000058 	.word	0x20000058
  801205c:	10624dd3 	.word	0x10624dd3
 
 08012060 <SDMMC_GetCmdResp6>:
@@ -47271,7 +47272,7 @@ uint32_t SDMMC_GetCmdResp6(SDMMC_TypeDef *SDMMCx, uint8_t SD_CMD, uint16_t *pRCA
  801213e:	46bd      	mov	sp, r7
  8012140:	bd80      	pop	{r7, pc}
  8012142:	bf00      	nop
- 8012144:	20000054 	.word	0x20000054
+ 8012144:	20000058 	.word	0x20000058
  8012148:	10624dd3 	.word	0x10624dd3
 
 0801214c <SDMMC_GetCmdResp7>:
@@ -47388,7 +47389,7 @@ uint32_t SDMMC_GetCmdResp7(SDMMC_TypeDef *SDMMCx)
  80121d8:	46bd      	mov	sp, r7
  80121da:	f85d 7b04 	ldr.w	r7, [sp], #4
  80121de:	4770      	bx	lr
- 80121e0:	20000054 	.word	0x20000054
+ 80121e0:	20000058 	.word	0x20000058
  80121e4:	10624dd3 	.word	0x10624dd3
 
 080121e8 <SDMMC_GetCmdError>:
@@ -47450,7 +47451,7 @@ static uint32_t SDMMC_GetCmdError(SDMMC_TypeDef *SDMMCx)
  8012230:	f85d 7b04 	ldr.w	r7, [sp], #4
  8012234:	4770      	bx	lr
  8012236:	bf00      	nop
- 8012238:	20000054 	.word	0x20000054
+ 8012238:	20000058 	.word	0x20000058
  801223c:	10624dd3 	.word	0x10624dd3
 
 08012240 <MX_FATFS_Init>:
@@ -47539,7 +47540,7 @@ __weak uint8_t BSP_SD_Init(void)
  801229a:	3708      	adds	r7, #8
  801229c:	46bd      	mov	sp, r7
  801229e:	bd80      	pop	{r7, pc}
- 80122a0:	20000728 	.word	0x20000728
+ 80122a0:	2000072c 	.word	0x2000072c
 
 080122a4 <BSP_SD_ReadBlocks_DMA>:
   * @param  ReadAddr: Address from where data is to be read
@@ -47581,7 +47582,7 @@ __weak uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_
  80122ce:	3718      	adds	r7, #24
  80122d0:	46bd      	mov	sp, r7
  80122d2:	bd80      	pop	{r7, pc}
- 80122d4:	20000728 	.word	0x20000728
+ 80122d4:	2000072c 	.word	0x2000072c
 
 080122d8 <BSP_SD_WriteBlocks_DMA>:
   * @param  WriteAddr: Address from where data is to be written
@@ -47623,7 +47624,7 @@ __weak uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint3
  8012302:	3718      	adds	r7, #24
  8012304:	46bd      	mov	sp, r7
  8012306:	bd80      	pop	{r7, pc}
- 8012308:	20000728 	.word	0x20000728
+ 8012308:	2000072c 	.word	0x2000072c
 
 0801230c <BSP_SD_GetCardState>:
   *          This value can be one of the following values:
@@ -47647,7 +47648,7 @@ __weak uint8_t BSP_SD_GetCardState(void)
  8012322:	4618      	mov	r0, r3
  8012324:	bd80      	pop	{r7, pc}
  8012326:	bf00      	nop
- 8012328:	20000728 	.word	0x20000728
+ 8012328:	2000072c 	.word	0x2000072c
 
 0801232c <BSP_SD_GetCardInfo>:
   * @brief  Get SD information about specific SD card.
@@ -47670,7 +47671,7 @@ __weak void BSP_SD_GetCardInfo(HAL_SD_CardInfoTypeDef *CardInfo)
  801233e:	3708      	adds	r7, #8
  8012340:	46bd      	mov	sp, r7
  8012342:	bd80      	pop	{r7, pc}
- 8012344:	20000728 	.word	0x20000728
+ 8012344:	2000072c 	.word	0x2000072c
 
 08012348 <HAL_SD_AbortCallback>:
   * @brief SD Abort callbacks
@@ -47910,7 +47911,7 @@ static DSTATUS SD_CheckStatus(BYTE lun)
  8012452:	3708      	adds	r7, #8
  8012454:	46bd      	mov	sp, r7
  8012456:	bd80      	pop	{r7, pc}
- 8012458:	20000099 	.word	0x20000099
+ 8012458:	2000009d 	.word	0x2000009d
 
 0801245c <SD_initialize>:
   * @brief  Initializes a Drive
@@ -48022,7 +48023,7 @@ Stat = STA_NOINIT;
  80124e2:	46bd      	mov	sp, r7
  80124e4:	bd90      	pop	{r4, r7, pc}
  80124e6:	bf00      	nop
- 80124e8:	20000099 	.word	0x20000099
+ 80124e8:	2000009d 	.word	0x2000009d
  80124ec:	20001520 	.word	0x20001520
  80124f0:	0801735c 	.word	0x0801735c
 
@@ -48399,7 +48400,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
  80126e6:	46bd      	mov	sp, r7
  80126e8:	bd80      	pop	{r7, pc}
  80126ea:	bf00      	nop
- 80126ec:	20000099 	.word	0x20000099
+ 80126ec:	2000009d 	.word	0x2000009d
 
 080126f0 <BSP_SD_WriteCpltCallback>:
   * @brief Tx Transfer completed callbacks
@@ -54744,7 +54745,7 @@ BaseType_t xReturn;
  80147d0:	08014e49 	.word	0x08014e49
  80147d4:	20001694 	.word	0x20001694
  80147d8:	20001570 	.word	0x20001570
- 80147dc:	200000ac 	.word	0x200000ac
+ 80147dc:	200000b0 	.word	0x200000b0
  80147e0:	20001690 	.word	0x20001690
  80147e4:	2000167c 	.word	0x2000167c
  80147e8:	20001674 	.word	0x20001674
@@ -55519,7 +55520,7 @@ void vTaskSwitchContext( void )
  8014c08:	20001570 	.word	0x20001570
  8014c0c:	20001678 	.word	0x20001678
  8014c10:	20001574 	.word	0x20001574
- 8014c14:	200000ac 	.word	0x200000ac
+ 8014c14:	200000b0 	.word	0x200000b0
 
 08014c18 <vTaskPlaceOnEventList>:
 /*-----------------------------------------------------------*/
@@ -57224,7 +57225,7 @@ volatile uint32_t ulDummy = 0;
  8015550:	f85d 7b04 	ldr.w	r7, [sp], #4
  8015554:	4770      	bx	lr
  8015556:	bf00      	nop
- 8015558:	2000009c 	.word	0x2000009c
+ 8015558:	200000a0 	.word	0x200000a0
  801555c:	00000000 	.word	0x00000000
 
 08015560 <SVC_Handler>:
@@ -57475,7 +57476,7 @@ BaseType_t xPortStartScheduler( void )
  8015698:	2000169c 	.word	0x2000169c
  801569c:	200016a0 	.word	0x200016a0
  80156a0:	e000ed20 	.word	0xe000ed20
- 80156a4:	2000009c 	.word	0x2000009c
+ 80156a4:	200000a0 	.word	0x200000a0
  80156a8:	e000ef34 	.word	0xe000ef34
 
 080156ac <vPortEnterCritical>:
@@ -57542,7 +57543,7 @@ void vPortEnterCritical( void )
  8015708:	f85d 7b04 	ldr.w	r7, [sp], #4
  801570c:	4770      	bx	lr
  801570e:	bf00      	nop
- 8015710:	2000009c 	.word	0x2000009c
+ 8015710:	200000a0 	.word	0x200000a0
  8015714:	e000ed04 	.word	0xe000ed04
 
 08015718 <vPortExitCritical>:
@@ -57597,7 +57598,7 @@ void vPortExitCritical( void )
  8015764:	46bd      	mov	sp, r7
  8015766:	f85d 7b04 	ldr.w	r7, [sp], #4
  801576a:	4770      	bx	lr
- 801576c:	2000009c 	.word	0x2000009c
+ 801576c:	200000a0 	.word	0x200000a0
 
 08015770 <PendSV_Handler>:
 
@@ -57745,7 +57746,7 @@ __attribute__(( weak )) void vPortSetupTimerInterrupt( void )
  8015852:	bf00      	nop
  8015854:	e000e010 	.word	0xe000e010
  8015858:	e000e018 	.word	0xe000e018
- 801585c:	20000054 	.word	0x20000054
+ 801585c:	20000058 	.word	0x20000058
  8015860:	10624dd3 	.word	0x10624dd3
  8015864:	e000e014 	.word	0xe000e014
 
@@ -58593,7 +58594,7 @@ uint8_t *puc;
  8015ce8:	6818      	ldr	r0, [r3, #0]
  8015cea:	f000 b825 	b.w	8015d38 <_malloc_r>
  8015cee:	bf00      	nop
- 8015cf0:	200000ac 	.word	0x200000ac
+ 8015cf0:	200000b0 	.word	0x200000b0
 
 08015cf4 <sbrk_aligned>:
  8015cf4:	b570      	push	{r4, r5, r6, lr}
@@ -58785,7 +58786,7 @@ uint8_t *puc;
  8015ea2:	e9c1 3004 	strd	r3, r0, [r1, #16]
  8015ea6:	f020 4000 	bic.w	r0, r0, #2147483648	@ 0x80000000
  8015eaa:	bd10      	pop	{r4, pc}
- 8015eac:	200000ac 	.word	0x200000ac
+ 8015eac:	200000b0 	.word	0x200000b0
  8015eb0:	080256f8 	.word	0x080256f8
  8015eb4:	0802570f 	.word	0x0802570f
  8015eb8:	abcd330e 	.word	0xabcd330e
@@ -58844,9 +58845,9 @@ uint8_t *puc;
  8015f3c:	4803      	ldr	r0, [pc, #12]	@ (8015f4c <stdio_exit_handler+0x14>)
  8015f3e:	f000 b869 	b.w	8016014 <_fwalk_sglue>
  8015f42:	bf00      	nop
- 8015f44:	200000a0 	.word	0x200000a0
+ 8015f44:	200000a4 	.word	0x200000a4
  8015f48:	08016a9d 	.word	0x08016a9d
- 8015f4c:	200000b0 	.word	0x200000b0
+ 8015f4c:	200000b4 	.word	0x200000b4
 
 08015f50 <cleanup_stdio>:
  8015f50:	6841      	ldr	r1, [r0, #4]
@@ -58982,7 +58983,7 @@ uint8_t *puc;
  8016080:	f85d eb04 	ldr.w	lr, [sp], #4
  8016084:	b003      	add	sp, #12
  8016086:	4770      	bx	lr
- 8016088:	200000ac 	.word	0x200000ac
+ 8016088:	200000b0 	.word	0x200000b0
  801608c:	ffff0208 	.word	0xffff0208
 
 08016090 <__sread>:
@@ -59143,7 +59144,7 @@ uint8_t *puc;
  80161ea:	e7bb      	b.n	8016164 <_reclaim_reent+0x1c>
  80161ec:	bd70      	pop	{r4, r5, r6, pc}
  80161ee:	bf00      	nop
- 80161f0:	200000ac 	.word	0x200000ac
+ 80161f0:	200000b0 	.word	0x200000b0
 
 080161f4 <_lseek_r>:
  80161f4:	b538      	push	{r3, r4, r5, lr}
@@ -59220,7 +59221,7 @@ uint8_t *puc;
  8016282:	6818      	ldr	r0, [r3, #0]
  8016284:	4770      	bx	lr
  8016286:	bf00      	nop
- 8016288:	200000ac 	.word	0x200000ac
+ 8016288:	200000b0 	.word	0x200000b0
 
 0801628c <__libc_init_array>:
  801628c:	b570      	push	{r4, r5, r6, lr}
@@ -59296,7 +59297,7 @@ uint8_t *puc;
  801631e:	4b04      	ldr	r3, [pc, #16]	@ (8016330 <__assert_func+0x38>)
  8016320:	e7f4      	b.n	801630c <__assert_func+0x14>
  8016322:	bf00      	nop
- 8016324:	200000ac 	.word	0x200000ac
+ 8016324:	200000b0 	.word	0x200000b0
  8016328:	080257a2 	.word	0x080257a2
  801632c:	08025774 	.word	0x08025774
  8016330:	08025767 	.word	0x08025767
@@ -60156,7 +60157,7 @@ uint8_t *puc;
  8016b04:	f85d eb04 	ldr.w	lr, [sp], #4
  8016b08:	b003      	add	sp, #12
  8016b0a:	4770      	bx	lr
- 8016b0c:	200000ac 	.word	0x200000ac
+ 8016b0c:	200000b0 	.word	0x200000b0
 
 08016b10 <memmove>:
  8016b10:	4288      	cmp	r0, r1
@@ -60625,7 +60626,7 @@ uint8_t *puc;
  8016f4e:	e7f4      	b.n	8016f3a <__swsetup_r+0x8e>
  8016f50:	2000      	movs	r0, #0
  8016f52:	e7f7      	b.n	8016f44 <__swsetup_r+0x98>
- 8016f54:	200000ac 	.word	0x200000ac
+ 8016f54:	200000b0 	.word	0x200000b0
 
 08016f58 <_raise_r>:
  8016f58:	291f      	cmp	r1, #31
@@ -60669,7 +60670,7 @@ uint8_t *puc;
  8016fac:	6818      	ldr	r0, [r3, #0]
  8016fae:	f7ff bfd3 	b.w	8016f58 <_raise_r>
  8016fb2:	bf00      	nop
- 8016fb4:	200000ac 	.word	0x200000ac
+ 8016fb4:	200000b0 	.word	0x200000b0
 
 08016fb8 <_kill_r>:
  8016fb8:	b538      	push	{r3, r4, r5, lr}
